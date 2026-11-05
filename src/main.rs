@@ -2,6 +2,7 @@ pub mod lander;
 pub mod world;
 pub mod chain_2d;
 pub mod collision_layers;
+pub mod config;
 
 use crate::lander::LanderPlugin;
 use crate::world::WorldPlugin;
@@ -18,7 +19,7 @@ fn main() {
     App::new()
         // .insert_resource(ClearColor(Color::BLACK))
         .add_plugins(DefaultPlugins)
-        .add_plugins(PhysicsPlugins::default().with_length_unit(15.0))
+        .add_plugins(PhysicsPlugins::default().with_length_unit(config::world::WORLD_SIZE))
         .insert_resource(ClearColor(Color::srgb(0.05, 0.05, 0.1)))
         .add_plugins(WorldPlugin)
         .add_plugins(LanderPlugin)

@@ -4,6 +4,7 @@ use avian2d::prelude::PhysicsLayer;
 pub enum WorldLayer {
     #[default]
     Floor,
+    Background,
     Enemies,
     Lander,
     Props,
