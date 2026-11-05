@@ -2,7 +2,10 @@
 pub mod world {
     pub const GRAVITY: f32 = 100.0;
 
+    /// pixels which will be used to indicate 1m in reference size
     pub const WORLD_SIZE: f32 = 50.0;
+
+    pub const WORLD_SEGMENTS: usize = 5;
 }
 
 pub mod lander {

@@ -3,6 +3,7 @@ pub mod world;
 pub mod chain_2d;
 pub mod collision_layers;
 pub mod config;
+pub mod thrusters;
 
 use crate::lander::LanderPlugin;
 use crate::world::WorldPlugin;
