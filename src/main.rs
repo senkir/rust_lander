@@ -4,6 +4,7 @@ pub mod chain_2d;
 pub mod collision_layers;
 pub mod config;
 pub mod thrusters;
+pub mod particles;
 
 use crate::lander::LanderPlugin;
 use crate::world::WorldPlugin;
@@ -13,6 +14,8 @@ use bevy::app::Startup;
 use bevy::camera::{Camera2d, ClearColor};
 use bevy::color::Color;
 use bevy::prelude::{App, Commands};
+use bevy_enoki::EnokiPlugin;
+use crate::particles::ParticlePlugin;
 
 fn main() {
     // chain_2d::main();
@@ -24,6 +27,7 @@ fn main() {
         .insert_resource(ClearColor(Color::srgb(0.05, 0.05, 0.1)))
         .add_plugins(WorldPlugin)
         .add_plugins(LanderPlugin)
+        .add_plugins(ParticlePlugin)
         .add_systems(Startup, create_camera)
         .run();
     //set up the bevy application screen

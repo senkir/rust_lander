@@ -19,3 +19,8 @@ pub mod lander {
     pub const THRUSTER_FORCE: f32 = 500.0;
     pub const ROTATION_SPEED: f32 = 10.0;
 }
+
+pub mod thruster {
+    pub const MAIN_THRUSTER_RADIUS: f32 = 50.0;
+    pub const SIDE_THRUSTER_RADIUS: f32 = 20.0;
+}

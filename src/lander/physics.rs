@@ -15,6 +15,9 @@ pub struct ShipStatus {
     pub velocity: f32,
 }
 
+#[derive(Component)]
+pub struct ThrustActiveState;
+
 impl ShipStatus {
     pub fn new() -> Self {
         Self {
@@ -41,7 +44,7 @@ pub fn observe_thruster_pressed(
         ship_status.is_thrusting = wants_boost;
 
         if (wants_boost) {
-            info!("wants boost!!!!");
+            // info!("wants boost!!!!");
 
             // Get the ship's forward vector by applying the current rotation to the ships initial facing
             // vector
@@ -61,7 +64,7 @@ pub fn apply_forces(forces: &mut ForcesItem) {
     //TODO: run this calculation
     let vector = calculate_thrust_vector(thruster_force, rot);
 
-    info!("apply_force {}", vector);
+    // info!("apply_force {}", vector);
 
     //apply thruster
     // forces.apply_force(vector);

@@ -42,7 +42,7 @@ pub fn handle_rotation_thrust(
         ship_status.angular_force = angular_velocity;
 
         info!("applying rotational thrust! angular_velocity(existing): {}, rotation_factor: {}", angular_velocity, rotation_factor);
-        //changing accelleration makes it rotate where implulse does not
+        //changing acceleration makes it rotate where impulse does not
         forces.apply_angular_acceleration(rotation_factor)
         // forces.apply_angular_impulse(rotation_factor)
     }
