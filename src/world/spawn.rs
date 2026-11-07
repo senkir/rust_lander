@@ -46,7 +46,7 @@ pub fn spawn_world(mut commands: Commands,
         Collider::rectangle(window_width, floor_thickness),
         CollisionLayers::new(
             [WorldLayer::Floor],
-            [WorldLayer::Floor, WorldLayer::Lander, WorldLayer::Enemies]),
+            [WorldLayer::Floor, WorldLayer::Package, WorldLayer::Lander, WorldLayer::Enemies]),
     ));
 
     //base walls
@@ -65,7 +65,7 @@ pub fn spawn_world(mut commands: Commands,
         Collider::rectangle(10.0, window_height),
         CollisionLayers::new(
             [WorldLayer::Floor],
-            [WorldLayer::Floor, WorldLayer::Lander, WorldLayer::Enemies]),
+            [WorldLayer::Floor, WorldLayer::Package, WorldLayer::Lander, WorldLayer::Enemies]),
     ));
 
     //right
@@ -81,7 +81,7 @@ pub fn spawn_world(mut commands: Commands,
         Collider::rectangle(10.0, window_height),
         CollisionLayers::new(
             [WorldLayer::Floor],
-            [WorldLayer::Floor, WorldLayer::Lander, WorldLayer::Enemies]),
+            [WorldLayer::Floor, WorldLayer::Lander, WorldLayer::Package, WorldLayer::Enemies]),
     ));
 }
 

@@ -21,6 +21,9 @@ pub mod lander {
 }
 
 pub mod thruster {
+    pub const SIDE_THRUSTER_Y_OFFSET: f32 = -5.0;
+    pub const SIDE_THRUSTER_X_OFFSET: f32 = 20.0;
+    pub const THRUSTER_Y_OFFSET: f32 = -10.0;
     pub const MAIN_THRUSTER_RADIUS: f32 = 50.0;
     pub const SIDE_THRUSTER_RADIUS: f32 = 20.0;
 }

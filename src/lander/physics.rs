@@ -7,7 +7,7 @@ use bevy::input::ButtonInput;
 use bevy::log::info;
 use bevy::prelude::{Component, KeyCode, Query, Res, Single, Transform, Vec2, With};
 
-#[derive(Component)]
+#[derive(Component, Debug)]
 pub struct ShipStatus {
     pub is_thrusting: bool,
     pub is_rotating: bool,
