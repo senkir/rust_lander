@@ -12,3 +12,9 @@ impl Plugin for DeliveriesPlugin {
         app.add_systems(Startup, spawn::spawn_package);
     }
 }
+
+
+mod config {
+
+    pub const MASS: f32 = 100.0;
+}

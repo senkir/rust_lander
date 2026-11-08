@@ -1,5 +1,6 @@
 use crate::config::lander;
 use crate::lander::lander::Lander;
+use crate::lander::ship::ShipStatus;
 use avian2d::parry::glamx::Vec3;
 use avian2d::prelude::forces::ForcesItem;
 use avian2d::prelude::{Forces, ReadRigidBodyForces, WriteRigidBodyForces};
@@ -7,30 +8,11 @@ use bevy::input::ButtonInput;
 use bevy::log::info;
 use bevy::prelude::{Component, KeyCode, Query, Res, Single, Transform, Vec2, With};
 
-#[derive(Component, Debug)]
-pub struct ShipStatus {
-    pub is_thrusting: bool,
-    pub is_rotating: bool,
-    pub angular_force: f32,
-    pub velocity: f32,
-}
-
 #[derive(Component)]
 pub struct ThrustActiveState;
 
-impl ShipStatus {
-    pub fn new() -> Self {
-        Self {
-            is_thrusting: false,
-            is_rotating: false,
-            angular_force: 0.0,
-            velocity: 0.0,
-        }
-    }
-}
-
 fn read_thrust_input(input: &ButtonInput<KeyCode>) -> bool {
-    input.pressed(KeyCode::Space)
+    input.pressed(KeyCode::ArrowUp)
 }
 
 pub fn observe_thruster_pressed(
@@ -44,11 +26,8 @@ pub fn observe_thruster_pressed(
         ship_status.is_thrusting = wants_boost;
 
         if (wants_boost) {
-            // info!("wants boost!!!!");
-
             // Get the ship's forward vector by applying the current rotation to the ships initial facing
             // vector
-            // let movement_direction = transform.rotation * Vec3::Y;
             apply_forces(&mut forces);
         }
     }
@@ -64,10 +43,6 @@ pub fn apply_forces(forces: &mut ForcesItem) {
     //TODO: run this calculation
     let vector = calculate_thrust_vector(thruster_force, rot);
 
-    // info!("apply_force {}", vector);
-
-    //apply thruster
-    // forces.apply_force(vector);
     forces.apply_linear_acceleration(vector);
 }
 
@@ -75,8 +50,6 @@ fn calculate_thrust_vector(thruster_force: f32, rotation_radians: f32) -> Vec2 {
     //TODO: run this calculation
     Vec2::new(-rotation_radians.sin(), rotation_radians.cos()) * thruster_force
 }
-
-pub fn spawn_thruster() {}
 
 #[cfg(test)]
 mod tests {

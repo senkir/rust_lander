@@ -1,13 +1,18 @@
-pub mod lander;
-pub mod world;
 pub mod chain_2d;
 pub mod collision_layers;
 pub mod config;
-pub mod thrusters;
-pub mod particles;
+pub mod damage;
 pub mod deliveries;
+pub mod lander;
+pub mod particles;
+pub mod thrusters;
+pub mod world;
+pub mod tractor;
 
+use crate::damage::DamagePlugin;
+use crate::deliveries::DeliveriesPlugin;
 use crate::lander::LanderPlugin;
+use crate::particles::ParticlePlugin;
 use crate::world::WorldPlugin;
 use avian2d::PhysicsPlugins;
 use bevy::DefaultPlugins;
@@ -16,8 +21,7 @@ use bevy::camera::{Camera2d, ClearColor};
 use bevy::color::Color;
 use bevy::prelude::{App, Commands};
 use bevy_enoki::EnokiPlugin;
-use crate::deliveries::DeliveriesPlugin;
-use crate::particles::ParticlePlugin;
+use crate::tractor::TractorPlugin;
 
 fn main() {
     // chain_2d::main();
@@ -30,6 +34,8 @@ fn main() {
         .add_plugins(WorldPlugin)
         .add_plugins((LanderPlugin, ParticlePlugin))
         .add_plugins(DeliveriesPlugin)
+        .add_plugins(DamagePlugin)
+        .add_plugins(TractorPlugin)
         .add_systems(Startup, create_camera)
         .run();
     //set up the bevy application screen

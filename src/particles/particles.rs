@@ -1,18 +1,12 @@
 use crate::config;
 use crate::lander::lander::Lander;
-use crate::lander::physics::ShipStatus;
-use crate::thrusters::components::ParticleEmitter;
-use avian2d::prelude::Forces;
-use bevy::log::{error, info};
+use crate::lander::ship::ShipStatus;
+use bevy::log::info;
 use bevy::prelude::{
-    Added, Asset, AssetServer, Children, Commands, Component, Entity, GetField, LinearRgba, Query,
-    Ref, Res, Transform, TypePath, Vec2, Vec3, With, Without, default,
+    Added, AssetServer, Commands, Component, Entity, Query, Res, Transform, With, default,
 };
-use bevy::time::Time;
-use bevy_enoki::prelude::{ColorParticle2dMaterial, MultiCurve, ParticleSpawnerState, Rval};
+use bevy_enoki::prelude::ParticleSpawnerState;
 use bevy_enoki::{ParticleEffectHandle, ParticleSpawner};
-use serde::Deserialize;
-use std::thread::spawn;
 
 /// marker component for thruster
 #[derive(Component)]
@@ -94,7 +88,6 @@ pub fn update_emitter(
     ship: Query<&ShipStatus, (With<Lander>)>,
     mut emitters: Query<&mut ParticleSpawnerState, (With<ThrustEmitter>)>,
 ) {
-
     let Ok(ship_status) = ship.single() else {
         return;
     };
@@ -103,9 +96,9 @@ pub fn update_emitter(
         return;
     };
 
-    if ship_status.is_thrusting {
-        info!("thrust on!! ship_status = {:?}", ship_status);
-    }
+    // if ship_status.is_thrusting {
+    //     info!("thrust on!! ship_status = {:?}", ship_status);
+    // }
 
     spawner_state.active = ship_status.is_thrusting;
 }
