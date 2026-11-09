@@ -9,7 +9,7 @@ pub mod world {
 }
 
 pub mod lander {
-    pub const MASS: f32 = 200.0;
+    pub const MASS: f32 = 500.0;
     pub const LANDER_SIZE: f32 = 50.0;
 
     pub const LANDER_START_X: f32 = 0.0;
@@ -18,7 +18,7 @@ pub mod lander {
     pub const LANDER_Z_POS: f32 = 10.0;
 
     pub const THRUSTER_FORCE: f32 = 500.0;
-    pub const ROTATION_SPEED: f32 = 5.0;
+    pub const ROTATION_FORCE: f32 = 10.0;
 }
 
 pub mod thruster {

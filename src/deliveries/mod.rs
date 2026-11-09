@@ -16,5 +16,5 @@ impl Plugin for DeliveriesPlugin {
 
 mod config {
 
-    pub const MASS: f32 = 100.0;
+    pub const MASS: f32 = 50.0;
 }

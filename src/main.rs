@@ -5,23 +5,27 @@ pub mod damage;
 pub mod deliveries;
 pub mod lander;
 pub mod particles;
-pub mod thrusters;
-pub mod world;
+pub mod thruster;
 pub mod tractor;
+pub mod world;
+
 
 use crate::damage::DamagePlugin;
 use crate::deliveries::DeliveriesPlugin;
 use crate::lander::LanderPlugin;
 use crate::particles::ParticlePlugin;
+use crate::tractor::TractorPlugin;
 use crate::world::WorldPlugin;
 use avian2d::PhysicsPlugins;
 use bevy::DefaultPlugins;
 use bevy::app::Startup;
-use bevy::camera::{Camera2d, ClearColor};
+use bevy::camera::{Camera, Camera2d, ClearColor, ClearColorConfig};
 use bevy::color::Color;
+use bevy::core_pipeline::tonemapping::Tonemapping;
+use bevy::post_process::bloom::Bloom;
 use bevy::prelude::{App, Commands};
-use bevy_enoki::EnokiPlugin;
-use crate::tractor::TractorPlugin;
+use bevy::render::view::DebandDither;
+use bevy::utils::default;
 
 fn main() {
     // chain_2d::main();
@@ -42,5 +46,14 @@ fn main() {
 }
 
 fn create_camera(mut commands: Commands) {
-    commands.spawn(Camera2d);
+    commands.spawn((
+        Camera2d,
+        Camera {
+            clear_color: ClearColorConfig::Custom(Color::BLACK),
+            ..default()
+        },
+        // Tonemapping::TonyMcMapface,
+        DebandDither::Enabled,
+        Bloom::default()
+    ));
 }

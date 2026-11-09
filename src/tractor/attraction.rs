@@ -13,8 +13,8 @@ pub fn apply_tractor_force(
     let Ok((lander_t, ship_tractor, lander_v)) = lander.single() else {
         return;
     };
-    if ship_tractor.state == TractorState::Off {
-        //no force if not ON
+    if ship_tractor.state != TractorState::On {
+        //no force unless fully ON
         return;
     }
     for (package_t, mut forces) in &mut packages {

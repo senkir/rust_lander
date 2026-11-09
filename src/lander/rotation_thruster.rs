@@ -48,5 +48,5 @@ fn gen_direction_input(input: &ButtonInput<KeyCode>) -> f32 {
     } else {
         0.0
     };
-    direction * config::lander::ROTATION_SPEED
+    direction * config::lander::ROTATION_FORCE
 }

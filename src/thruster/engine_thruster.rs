@@ -6,26 +6,19 @@ use avian2d::prelude::forces::ForcesItem;
 use avian2d::prelude::{Forces, ReadRigidBodyForces, WriteRigidBodyForces};
 use bevy::input::ButtonInput;
 use bevy::log::info;
-use bevy::prelude::{Component, KeyCode, Query, Res, Single, Transform, Vec2, With};
+use bevy::prelude::{Changed, Component, KeyCode, Query, Res, Single, Transform, Vec2, With};
 
 #[derive(Component)]
 pub struct ThrustActiveState;
 
-fn read_thrust_input(input: &ButtonInput<KeyCode>) -> bool {
-    input.pressed(KeyCode::ArrowUp)
-}
-
-pub fn observe_thruster_pressed(
-    input: Res<ButtonInput<KeyCode>>,
-    mut query: Query<(Forces, &mut ShipStatus), With<Lander>>,
+pub fn handle_thrust_active_state(
+    mut query: Query<(Forces, &ShipStatus), Changed<ShipStatus>>,
 ) {
-    let wants_boost = read_thrust_input(&input);
 
-    for (mut forces, mut ship_status) in query.iter_mut() {
+    for (mut forces, ship_status) in query.iter_mut() {
         //update boosting
-        ship_status.is_thrusting = wants_boost;
 
-        if (wants_boost) {
+        if (ship_status.is_thrusting) {
             // Get the ship's forward vector by applying the current rotation to the ships initial facing
             // vector
             apply_forces(&mut forces);
@@ -33,7 +26,7 @@ pub fn observe_thruster_pressed(
     }
 }
 
-pub fn apply_forces(forces: &mut ForcesItem) {
+fn apply_forces(forces: &mut ForcesItem) {
     //TODO: calculate force from orientation
     //for now just always apply a vertical thrust
     let thruster_force = lander::THRUSTER_FORCE;

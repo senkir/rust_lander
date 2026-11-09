@@ -2,18 +2,62 @@ use crate::config;
 use crate::lander::lander::Lander;
 use crate::lander::ship::ShipStatus;
 use bevy::log::info;
-use bevy::prelude::{
-    Added, AssetServer, Commands, Component, Entity, Query, Res, Transform, With, default,
-};
-use bevy_enoki::prelude::ParticleSpawnerState;
+use bevy::prelude::{default, Added, AssetServer, Bundle, Commands, Component, Entity, Query, Res, Transform, With, Assets, ResMut};
+use bevy_enoki::prelude::{ColorParticle2dMaterial, ParticleSpawnerState};
 use bevy_enoki::{ParticleEffectHandle, ParticleSpawner};
+use crate::particles::materials::FireParticleMaterial;
 
 /// marker component for thruster
 #[derive(Component)]
-pub struct ThrustEmitter;
+pub struct ThrustEmitter {
+    pub angle: u32,
+    pub thrust_type: ThrustType
+}
+
+#[derive(Component, Default, Clone, Copy, Eq, PartialEq, Debug)]
+pub enum ThrustType {
+    Small,
+    #[default]
+    Large
+}
+
+impl Default for ThrustEmitter {
+    fn default() -> Self {
+        Self {
+            angle: 0,
+            thrust_type: ThrustType::Large
+        }
+    }
+}
+
+fn spawn_emitter_internal(
+    server: &AssetServer,
+    mut materials: &mut ResMut<Assets<FireParticleMaterial>>,
+    // material: &mut Assets<ColorParticle2dMaterial>,
+) -> impl Bundle {
+    //replace color particle material with custom Particle2d one
+    //need additive blending. ColorParticle2d is the default
+
+    (
+        ThrustEmitter::default(),
+        //base spawner definition
+        // ParticleSpawner::from(material),
+        ParticleSpawner(materials.add(FireParticleMaterial::default())),
+        //specific effect
+        ParticleEffectHandle(server.load("main_thrust.ron")),
+        //not active yet
+        ParticleSpawnerState {
+            active: false,
+            ..default()
+        },
+        //move it around
+        Transform::from_xyz(0.0, config::thruster::THRUSTER_Y_OFFSET, 0.1),
+    )
+}
 
 pub fn spawn_emitter(
     mut commands: Commands,
+    mut materials: ResMut<Assets<FireParticleMaterial>>,
     server: Res<AssetServer>,
     entity: Query<Entity, Added<Lander>>, // runs once per lander
 ) {
@@ -21,32 +65,35 @@ pub fn spawn_emitter(
     // (hot reload by default)
     //TODO: write logic for a custom particle ron file
 
+    // let mat = materials.add(ColorParticle2dMaterial::new(
+    //     server.load("flame.png"),
+    //     1, 1, // sprite sheet columns, rows (1,1 for a single image)
+    // ));
+    //
+
+    // let flame_material = FireParticleMaterial::default();
+
     for (lander) in entity.iter() {
-        //
-        // //we only want the negative case
-        // let Err(_) = emitter.single() else {
-        //     error!("thruster already exists!");
-        //     return;
-        // };
 
         //TODO: only run this once
         // if (ship_status.is_thrusting) {
         info!("thrusting spawned! {}", lander);
         //Spawn the child
-        commands.entity(lander).with_child((
-            ThrustEmitter,
-            //base spawner definition
-            ParticleSpawner::default(),
-            //specific effect
-            ParticleEffectHandle(server.load("main_thrust.ron")),
-            //not active yet
-            ParticleSpawnerState {
-                active: false,
-                ..default()
-            },
-            //move it around
-            Transform::from_xyz(0.0, config::thruster::THRUSTER_Y_OFFSET, 0.1),
-        ));
+        commands.entity(lander).with_child(spawn_emitter_internal(&server, &mut materials));
+        // commands.entity(lander).insert((
+        //     ThrustEmitter::default(),
+        //     //base spawner definition
+        //     ParticleSpawner::default(),
+        //     //specific effect
+        //     ParticleEffectHandle(server.load("main_thrust.ron")),
+        //     //not active yet
+        //     ParticleSpawnerState {
+        //         active: false,
+        //         ..default()
+        //     },
+        //     //move it around
+        //     Transform::from_xyz(0.0, config::thruster::THRUSTER_Y_OFFSET, 0.1),
+        // ));
 
         //left
         // commands.entity(lander).with_child((
@@ -101,22 +148,4 @@ pub fn update_emitter(
     // }
 
     spawner_state.active = ship_status.is_thrusting;
-}
-
-pub fn despawn_emitter(
-    mut commands: Commands,
-    ship: Query<&ShipStatus, (With<Lander>)>,
-    query: Query<Entity, (With<ThrustEmitter>)>,
-) {
-    let Ok(thrust_emitter) = query.single() else {
-        return;
-    };
-
-    let Ok(ship_status) = ship.single() else {
-        return;
-    };
-    if (!ship_status.is_thrusting) {
-        info!("thrusting stopped!");
-        commands.entity(thrust_emitter).despawn();
-    }
 }
