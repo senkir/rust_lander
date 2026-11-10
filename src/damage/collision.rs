@@ -1,19 +1,29 @@
 use crate::damage::health::Health;
 use avian2d::prelude::{CollisionStart, Collisions, ContactGraph, Mass, Physics};
 use bevy::log::info;
-use bevy::prelude::{Entity, MessageReader, Query, Res, With};
+use bevy::prelude::{Component, Entity, Message, MessageReader, MessageWriter, Query, Res, With};
 use bevy::time::Time;
 
 use crate::damage;
+use crate::deliveries::delivery::Delivery;
+use crate::lander::lander::Lander;
+
+const IMPACT_THRESHOLD: f32 = 500.0;
+
+const COLLISION_DAMAGE: u32 = 20;
+
+#[derive(Message)]
+pub struct DamageEvent { pub target: Entity, pub amount: u32 }
 
 /// observe any collisions on bodies with health
 pub fn observe_collisions(
     mut reader: MessageReader<CollisionStart>,
-    query: Query<Entity, With<Health>>,
     collisions: Collisions,
-    health: Query<&Mass, With<Health>>,
+    mut writer: MessageWriter<DamageEvent>,
+    mut health: Query<(&Mass, &mut Health), With<Health>>,
+    landers: Query<(), With<Lander>>,
+    packages: Query<(), With<Delivery>>,
 ) {
-    let mut total_impulse = 0.0;
 
     for collision_event in reader.read() {
         info!("Collision event: {:?}", collision_event);
@@ -34,11 +44,41 @@ pub fn observe_collisions(
 
         //try to take into account impact to generate a result
         for body in [body_a, body_b].iter() {
-            if let Ok(mass) = health.get(*body) {
+            if let Ok((mass, mut health)) = health.get_mut(*body) {
                 let impact_speed = impulse / mass.0;
                 info!("impact {:?}", impact_speed);
+
+                if (impact_speed > IMPACT_THRESHOLD) {
+                    //damage happened
+
+                    writer.write(DamageEvent { target: *body, amount: COLLISION_DAMAGE });
+
+                    if landers.contains(*body) {
+                        //lander destruction
+                        info!("lander damaged {:?}", body);
+                    }
+                    if packages.contains(*body) {
+                        //package destruction
+                        info!("packages damaged {:?}", body);
+                    }
+                }
             }
         }
 
     }
+}
+
+pub fn apply_damage(
+    mut events: MessageReader<DamageEvent>,
+    mut health: Query<&mut Health>,
+) {
+    for event in events.read() {
+        if let Ok(mut h) = health.get_mut(event.target) {
+            h.apply_damage(event.amount);
+        }
+    }
+}
+
+pub fn render_damage() {
+
 }

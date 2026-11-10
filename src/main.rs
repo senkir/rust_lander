@@ -1,31 +1,29 @@
+pub mod beam;
+pub mod camera;
 pub mod chain_2d;
 pub mod config;
 pub mod damage;
 pub mod deliveries;
+pub mod delivery_target;
 pub mod lander;
 pub mod particles;
+pub mod score;
 pub mod thruster;
-pub mod beam;
 pub mod world;
-pub mod camera;
-pub mod delivery_target;
 
+use crate::beam::TractorPlugin;
+use crate::camera::CameraPlugin;
 use crate::damage::DamagePlugin;
 use crate::deliveries::DeliveriesPlugin;
 use crate::lander::LanderPlugin;
 use crate::particles::ParticlePlugin;
-use crate::beam::TractorPlugin;
+use crate::score::ScorePlugin;
 use crate::world::WorldPlugin;
 use avian2d::PhysicsPlugins;
 use bevy::DefaultPlugins;
-use bevy::app::Startup;
-use bevy::camera::{Camera, Camera2d, ClearColor, ClearColorConfig};
+use bevy::camera::ClearColor;
 use bevy::color::Color;
-use bevy::post_process::bloom::Bloom;
-use bevy::prelude::{App, Commands};
-use bevy::render::view::DebandDither;
-use bevy::utils::default;
-use crate::camera::CameraPlugin;
+use bevy::prelude::App;
 
 fn main() {
     // chain_2d::main();
@@ -41,6 +39,7 @@ fn main() {
         .add_plugins(DamagePlugin)
         .add_plugins(TractorPlugin)
         .add_plugins(CameraPlugin)
+        .add_plugins(ScorePlugin)
         .run();
     //set up the bevy application screen
 }

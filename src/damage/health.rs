@@ -13,4 +13,8 @@ impl Health {
     pub fn is_dead(&self) -> bool {
         self.0 == 0
     }
+    
+    pub fn apply_damage(&mut self, damage: u32) {
+        self.0 = self.0.saturating_sub(damage);
+    }
 }
