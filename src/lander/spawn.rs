@@ -3,7 +3,7 @@ use crate::damage::health::Health;
 use crate::lander::ship::ShipStatus;
 use crate::lander::lander::Lander;
 use crate::world::layers::WorldLayer;
-use avian2d::prelude::{Collider, CollisionEventsEnabled, CollisionLayers, Mass, RigidBody};
+use avian2d::prelude::{AngularDamping, Collider, CollisionEventsEnabled, CollisionLayers, LinearDamping, Mass, RigidBody};
 use bevy::asset::{AssetServer, Handle};
 use bevy::log::error;
 use bevy::math::Vec3;
@@ -41,6 +41,10 @@ pub fn spawn_lander(
         ),
         // physics
         RigidBody::Dynamic,
+
+        //TODO: make this dynamic per environment
+        LinearDamping(crate::config::world::LINEAR_DRAG),   // slows translation, like drag
+        AngularDamping(crate::config::world::ANGULAR_DRAG),  // slows spin
         // rendered object
         CollisionEventsEnabled,
         ShipTractor::default(),

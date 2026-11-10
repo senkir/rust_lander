@@ -1,9 +1,9 @@
-use bevy::app::{App, Plugin, Startup, Update};
+use bevy::app::{App, Plugin, Update};
 use bevy::prelude::{Component, IntoScheduleConfigs};
 
 pub mod attraction;
 pub mod ship;
-pub mod spawn;
+pub mod system;
 
 const BEAM_RANGE: f32 = 150.0;
 const BEAM_STRENGTH: f32 = 300_000.0; // tune against Mass and Gravity
@@ -17,10 +17,9 @@ impl Plugin for TractorPlugin {
         app.add_systems(
             Update,
             (
-                spawn::spawn_tractor_beam,
-                spawn::observe_tractor_beam_start,
-                spawn::enable_tractor_beam,
-                spawn::disable_tractor_beam,
+                system::observe_tractor_beam_start,
+                system::enable_tractor_beam,
+                system::disable_tractor_beam,
                 attraction::apply_tractor_force,
             )
                 .chain(),

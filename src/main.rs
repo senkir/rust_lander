@@ -1,5 +1,4 @@
 pub mod chain_2d;
-pub mod collision_layers;
 pub mod config;
 pub mod damage;
 pub mod deliveries;
@@ -8,7 +7,6 @@ pub mod particles;
 pub mod thruster;
 pub mod tractor;
 pub mod world;
-
 
 use crate::damage::DamagePlugin;
 use crate::deliveries::DeliveriesPlugin;
@@ -21,7 +19,6 @@ use bevy::DefaultPlugins;
 use bevy::app::Startup;
 use bevy::camera::{Camera, Camera2d, ClearColor, ClearColorConfig};
 use bevy::color::Color;
-use bevy::core_pipeline::tonemapping::Tonemapping;
 use bevy::post_process::bloom::Bloom;
 use bevy::prelude::{App, Commands};
 use bevy::render::view::DebandDither;
@@ -54,6 +51,6 @@ fn create_camera(mut commands: Commands) {
         },
         // Tonemapping::TonyMcMapface,
         DebandDither::Enabled,
-        Bloom::default()
+        Bloom::default(),
     ));
 }

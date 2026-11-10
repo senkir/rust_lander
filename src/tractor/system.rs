@@ -2,7 +2,10 @@ use crate::lander::lander::Lander;
 use crate::tractor::ship::{ShipTractor, TractorState};
 use bevy::asset::AssetServer;
 use bevy::log::{error, info};
-use bevy::prelude::{default, Added, ButtonInput, Changed, Commands, Component, Entity, KeyCode, Query, Res, Transform, With};
+use bevy::prelude::{
+    Added, ButtonInput, Changed, Commands, Component, Entity, KeyCode, Query, Res, Transform, With,
+    default,
+};
 use bevy_enoki::prelude::ParticleSpawnerState;
 use bevy_enoki::{ParticleEffectHandle, ParticleSpawner};
 
@@ -30,35 +33,6 @@ pub fn observe_tractor_beam_start(
         info!("tractor turning off");
 
         tractor_state.state = TractorState::TurningOff;
-    }
-}
-
-pub fn spawn_tractor_beam(
-    mut commands: Commands,
-    server: Res<AssetServer>,
-    lander_query: Query<Entity, Added<Lander>>,
-) {
-    //spawn
-
-
-    for (lander) in lander_query.iter() {
-        error!("spawning tractor particle gen");
-        commands.entity(lander).with_child((
-            TractorParticle,
-            //base spawner definition
-            ParticleSpawner::default(),
-            //specific effect
-            ParticleEffectHandle(server.load("tractor_ui.ron")),
-            //not active yet
-            ParticleSpawnerState {
-                active: false,
-                ..default()
-            },
-            //move it around
-            Transform::from_xyz(0.0, 0.0, 0.1),
-        ));
-        //just end it here
-        return;
     }
 }
 

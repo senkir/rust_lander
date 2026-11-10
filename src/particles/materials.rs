@@ -11,6 +11,24 @@ pub struct FireParticleMaterial {
 
 impl Particle2dMaterial for FireParticleMaterial {
     fn fragment_shader() -> bevy::shader::ShaderRef {
-        "sample_mat.wesl".into()
+        "materials/flame_jet.wesl".into()
+    }
+}
+
+#[derive(AsBindGroup, Asset, TypePath, Clone)]
+pub struct SideJetMaterial {
+    #[uniform(0)]
+    pub tint: LinearRgba,
+}
+
+impl Default for SideJetMaterial {
+    fn default() -> Self {
+        Self { tint: LinearRgba::new(1.0, 1.0, 1.0, 1.0) }
+    }
+}
+
+impl Particle2dMaterial for SideJetMaterial {
+    fn fragment_shader() -> bevy::shader::ShaderRef {
+        "materials/arrow_jet.wesl".into()
     }
 }

@@ -2,10 +2,10 @@
     spawn_rate: 0.01,            // was 0.1: spawn 10x as often
     spawn_amount: 8,             // was 1: several per tick, so it looks dense
     emission_shape: Circle(4.0), // small spread at the nozzle instead of a single point
-    lifetime: (1.6, 0.8),        // was 15.0: short-lived flames (0.6s ± 0.4)
+    lifetime: (0.8, 0.8),        // was 15.0: short-lived flames (0.6s ± 0.4)
     linear_speed: Some((120.0, 0.4)),
     linear_acceleration: Some((0.0, 0.0)),
-    direction: Some(((0.0, -1.0), 0.2)), // down, away from the ship; narrower cone
+    direction: Some(((0.0, -1.0), 0.1)), // down, away from the ship; narrower cone
     angular_speed: Some((2.0, 1.0)),
     angular_acceleration: Some((0.0, 0.0)),
     scale: Some((6.0, 0.5)),

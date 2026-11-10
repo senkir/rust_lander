@@ -1,6 +1,9 @@
 
 pub mod world {
     pub const GRAVITY: f32 = 100.0;
+    
+    pub const ANGULAR_DRAG: f32 = 1.5;
+    pub const LINEAR_DRAG: f32 = 0.5;
 
     /// pixels which will be used to indicate 1m in reference size
     pub const WORLD_SIZE: f32 = 50.0;

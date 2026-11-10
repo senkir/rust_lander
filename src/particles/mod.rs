@@ -1,26 +1,36 @@
-use bevy::app::App;
-use bevy::asset::Handle;
-use bevy::prelude::{Asset, Component, Image, IntoScheduleConfigs, Plugin, TypePath, Update};
-use bevy::render::render_resource::AsBindGroup;
-use bevy_enoki::{EnokiPlugin, ParticleEffectHandle};
-use bevy_enoki::prelude::{Particle2dMaterial, Particle2dMaterialPlugin};
 use crate::particles::materials::FireParticleMaterial;
+use crate::particles::materials::SideJetMaterial;
+use bevy::app::App;
+use bevy::prelude::{Component, Plugin, Update};
+use bevy_enoki::EnokiPlugin;
+use bevy_enoki::prelude::Particle2dMaterialPlugin;
 
-pub mod particles;
 pub mod materials;
+pub mod thrusters;
+pub mod tractor_beam;
+
+mod config {
+    pub const PARTICLE_TRACTOR_BEAM: &str = "particles/tractor_ui.ron";
+    pub const PARTICLE_MAIN_THRUSTER: &str = "particles/main_thrust.ron";
+    pub const PARTICLE_MAIN_THRUSTER_CORE: &str = "particles/main_thrust_core.ron";
+    pub const PARTICLE_RIGHT_THRUSTER: &str = "particles/side_thrust_right.ron";
+    pub const PARTICLE_LEFT_THRUSTER: &str = "particles/side_thrust_left.ron";
+    pub const PARTICLE_REVERSE_THRUSTER: &str = "particles/reverse_thrust.ron";
+    
+    pub const TRACTOR_BEAM_Z_OFFSET: f32 = 0.1;
+    pub const ENGINE_Z_OFFSET: f32 = 0.3;
+}
 
 #[derive(Component)]
 pub struct ParticlePlugin;
 
 impl Plugin for ParticlePlugin {
     fn build(&self, app: &mut App) {
-        app
-            .add_plugins(EnokiPlugin)
+        app.add_plugins(EnokiPlugin)
             .add_plugins(Particle2dMaterialPlugin::<FireParticleMaterial>::default())
-            .add_systems(Update, (particles::spawn_emitter,
-                                  particles::update_emitter,
-            ).chain())
-        ;
+            .add_plugins(Particle2dMaterialPlugin::<SideJetMaterial>::default())
+            .add_observer(thrusters::spawn_emitter)
+            .add_observer(tractor_beam::spawn_tractor_beam)
+            .add_systems(Update, thrusters::update_emitter);
     }
-
 }

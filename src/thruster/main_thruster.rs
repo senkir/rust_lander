@@ -5,8 +5,9 @@ use avian2d::parry::glamx::Vec3;
 use avian2d::prelude::forces::ForcesItem;
 use avian2d::prelude::{Forces, ReadRigidBodyForces, WriteRigidBodyForces};
 use bevy::input::ButtonInput;
-use bevy::log::info;
+use bevy::log::{error, info};
 use bevy::prelude::{Changed, Component, KeyCode, Query, Res, Single, Transform, Vec2, With};
+use crate::lander::input::InputDirection;
 
 #[derive(Component)]
 pub struct ThrustActiveState;
@@ -18,15 +19,26 @@ pub fn handle_thrust_active_state(
     for (mut forces, ship_status) in query.iter_mut() {
         //update boosting
 
-        if (ship_status.is_thrusting) {
+        if (ship_status.is_thrusting()) {
             // Get the ship's forward vector by applying the current rotation to the ships initial facing
             // vector
-            apply_forces(&mut forces);
+            match ship_status.thrust_direction {
+                InputDirection::Forward => {
+                    apply_forward_thrust(&mut forces);
+                }
+                InputDirection::Backward => {
+                    apply_backward_thrust(&mut forces);
+                }
+                _ => {
+                    //nothing
+                    error!("Thrust direction changed to {:?}", ship_status.thrust_direction);
+                }
+            }
         }
     }
 }
 
-fn apply_forces(forces: &mut ForcesItem) {
+fn apply_forward_thrust(forces: &mut ForcesItem) {
     //TODO: calculate force from orientation
     //for now just always apply a vertical thrust
     let thruster_force = lander::THRUSTER_FORCE;
@@ -37,6 +49,20 @@ fn apply_forces(forces: &mut ForcesItem) {
     let vector = calculate_thrust_vector(thruster_force, rot);
 
     forces.apply_linear_acceleration(vector);
+}
+
+
+fn apply_backward_thrust(forces: &mut ForcesItem) {
+    //TODO: calculate force from orientation
+    //for now just always apply a vertical thrust
+    let thruster_force = lander::THRUSTER_FORCE;
+
+    let rot = forces.rotation().as_radians();
+
+    //TODO: run this calculation
+    let vector = calculate_thrust_vector(thruster_force, rot);
+
+    forces.apply_linear_acceleration(-vector);
 }
 
 fn calculate_thrust_vector(thruster_force: f32, rotation_radians: f32) -> Vec2 {

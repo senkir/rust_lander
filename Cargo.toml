@@ -8,7 +8,7 @@ edition = "2024"
 [dependencies]
 bevy = { version = "0.20.1",
     default-features = false,
-    features = ["2d"] }
+    features = ["2d", "file_watcher"] }
 rand = "0.10.3"
 # localization
 fluent = "0.17.0"
