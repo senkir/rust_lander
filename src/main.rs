@@ -7,6 +7,7 @@ pub mod particles;
 pub mod thruster;
 pub mod tractor;
 pub mod world;
+pub mod camera;
 
 use crate::damage::DamagePlugin;
 use crate::deliveries::DeliveriesPlugin;
@@ -23,6 +24,7 @@ use bevy::post_process::bloom::Bloom;
 use bevy::prelude::{App, Commands};
 use bevy::render::view::DebandDither;
 use bevy::utils::default;
+use crate::camera::CameraPlugin;
 
 fn main() {
     // chain_2d::main();
@@ -37,20 +39,7 @@ fn main() {
         .add_plugins(DeliveriesPlugin)
         .add_plugins(DamagePlugin)
         .add_plugins(TractorPlugin)
-        .add_systems(Startup, create_camera)
+        .add_plugins(CameraPlugin)
         .run();
     //set up the bevy application screen
-}
-
-fn create_camera(mut commands: Commands) {
-    commands.spawn((
-        Camera2d,
-        Camera {
-            clear_color: ClearColorConfig::Custom(Color::BLACK),
-            ..default()
-        },
-        // Tonemapping::TonyMcMapface,
-        DebandDither::Enabled,
-        Bloom::default(),
-    ));
 }
