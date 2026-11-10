@@ -1,13 +1,8 @@
 use crate::lander::lander::Lander;
 use crate::tractor::ship::{ShipTractor, TractorState};
-use bevy::asset::AssetServer;
-use bevy::log::{error, info};
-use bevy::prelude::{
-    Added, ButtonInput, Changed, Commands, Component, Entity, KeyCode, Query, Res, Transform, With,
-    default,
-};
+use bevy::log::info;
+use bevy::prelude::{ButtonInput, Changed, Component, KeyCode, Query, Res, With};
 use bevy_enoki::prelude::ParticleSpawnerState;
-use bevy_enoki::{ParticleEffectHandle, ParticleSpawner};
 
 #[derive(Component)]
 pub struct TractorParticle;
@@ -37,10 +32,10 @@ pub fn observe_tractor_beam_start(
 }
 
 pub fn enable_tractor_beam(
-    mut lander_query: Query<&mut ParticleSpawnerState, With<TractorParticle>>,
-    mut query: Query<&mut ShipTractor, Changed<ShipTractor>>,
+    mut particle_query: Query<&mut ParticleSpawnerState, With<TractorParticle>>,
+    mut ship_query: Query<&mut ShipTractor, Changed<ShipTractor>>,
 ) {
-    let Ok(mut ship_tractor) = query.single_mut() else {
+    let Ok(mut ship_tractor) = ship_query.single_mut() else {
         return;
     };
 
@@ -48,30 +43,27 @@ pub fn enable_tractor_beam(
         //spawn
         ship_tractor.state = TractorState::On;
 
-        let Ok(mut spawner_state) = lander_query.single_mut() else {
-            error!("lander spawner state not set");
-            return;
-        };
-        info!("tractor on");
-        spawner_state.active = true;
+        for (mut spawner_state) in particle_query.iter_mut() {
+            info!("tractor on");
+            spawner_state.active = true;
+        }
     }
 }
 
 pub fn disable_tractor_beam(
-    mut lander_query: Query<&mut ParticleSpawnerState, With<TractorParticle>>,
-    mut query: Query<&mut ShipTractor, Changed<ShipTractor>>,
+    mut particle_query: Query<&mut ParticleSpawnerState, With<TractorParticle>>,
+    mut ship_query: Query<&mut ShipTractor, Changed<ShipTractor>>,
 ) {
-    let Ok(mut ship_tractor) = query.single_mut() else {
+    let Ok(mut ship_tractor) = ship_query.single_mut() else {
         return;
     };
 
     if ship_tractor.state == TractorState::TurningOff {
         ship_tractor.state = TractorState::Off;
 
-        let Ok(mut spawner_state) = lander_query.single_mut() else {
-            return;
-        };
-        info!("tractor off");
-        spawner_state.active = false;
+        for (mut spawner_state) in particle_query.iter_mut() {
+            info!("tractor off");
+            spawner_state.active = false;
+        }
     }
 }

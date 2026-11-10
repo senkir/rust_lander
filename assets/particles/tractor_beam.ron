@@ -1,0 +1,30 @@
+(
+    spawn_rate: 0.1,
+    spawn_amount: 5,
+    emission_shape: Circle(70.0),
+    lifetime: (0.8, 0.4),
+    linear_speed: Some((4.0, 0.5)),
+    linear_acceleration: Some((0.0, 0.0)),
+    direction: Some(((0.0, 1.0), 1.0)),
+    angular_speed: Some((0.3, 1.0)),
+    angular_acceleration: Some((0.0, 0.0)),
+    scale: Some((240.0, 0.6)),            // overridden by scale_curve
+    color: Some((red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)),   // overridden by color_curve
+    gravity_direction: Some(((0.0, 1.0), 0.0)),
+    gravity_speed: Some((6.0, 0.5)),
+    linear_damp: Some((0.6, 0.3)),
+    angular_damp: Some((0.0, 0.0)),
+    scale_curve: Some((points: [
+        (0.0, 0.0, None),
+        (130.0, 0.4, Some(CubicOut)),     // very large
+        (0.0, 1.0, Some(CubicIn)),
+    ])),
+    color_curve: Some((points: [
+        ((red: 0.1, green: 0.9, blue: 0.5, alpha: 0.0), 0.0, None),
+        ((red: 0.2, green: 1.0, blue: 0.6, alpha: 0.14), 0.4, Some(CubicOut)),   // soft swell
+        ((red: 0.15, green: 0.9, blue: 0.7, alpha: 0.1), 0.7, None),             // slightly cooler
+        ((red: 0.1, green: 0.6, blue: 0.5, alpha: 0.0), 1.0, Some(CubicIn)),
+    ])),
+    attractors: None,
+    relative_positioning: Some(true),
+)

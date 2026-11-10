@@ -32,3 +32,40 @@ impl Particle2dMaterial for SideJetMaterial {
         "materials/arrow_jet.wesl".into()
     }
 }
+
+#[derive(AsBindGroup, Asset, TypePath, Clone)]
+pub struct TractorBeamMaterial {
+    #[uniform(0)]
+    pub tint: LinearRgba,
+}
+
+impl Default for TractorBeamMaterial {
+    fn default() -> Self {
+        Self { tint: LinearRgba::new(1.0, 1.0, 1.0, 1.0) }
+    }
+}
+
+impl Particle2dMaterial for TractorBeamMaterial {
+    fn fragment_shader() -> bevy::shader::ShaderRef {
+        "materials/tractor_beam.wesl".into()
+    }
+}
+
+#[derive(AsBindGroup, Asset, TypePath, Clone)]
+pub struct TractorSparkleMaterial {
+    #[uniform(0)]
+    pub tint: LinearRgba,
+}
+
+
+impl Default for TractorSparkleMaterial {
+    fn default() -> Self {
+        Self { tint: LinearRgba::new(1.0, 1.0, 1.0, 1.0) }
+    }
+}
+
+impl Particle2dMaterial for TractorSparkleMaterial {
+    fn fragment_shader() -> bevy::shader::ShaderRef {
+        "materials/tractor_beam_sparkles.wesl".into()
+    }
+}
