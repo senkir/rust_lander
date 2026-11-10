@@ -11,7 +11,7 @@ use bevy::prelude::{
     Color, Commands, Entity, Image, Query, Res, Transform, Vec2, With, default, info,
 };
 use bevy::sprite::Sprite;
-use crate::tractor::ship::{ShipTractor, TractorState};
+use crate::beam::ship::{ShipTractor, TractorState};
 
 pub fn spawn_lander(
     mut commands: Commands,
@@ -60,6 +60,7 @@ pub fn spawn_lander(
             [
                 WorldLayer::Floor,
                 WorldLayer::Package,
+                WorldLayer::Target,
                 WorldLayer::Enemies,
                 WorldLayer::Props,
             ],

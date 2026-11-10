@@ -1,6 +1,6 @@
 use crate::lander::lander::Lander;
 use crate::particles::materials::{TractorBeamMaterial, TractorSparkleMaterial};
-use crate::tractor::system::TractorParticle;
+use crate::beam::system::TractorParticle;
 use bevy::asset::{AssetServer, Assets};
 use bevy::color::LinearRgba;
 use bevy::prelude::{Add, Commands, On, Res, ResMut, Transform, default};

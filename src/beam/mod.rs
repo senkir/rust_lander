@@ -9,7 +9,10 @@ const HOLD_OFFSET: f32 = 45.0;      // lander half-size + package half-size + ma
 
 const BEAM_RANGE: f32 = 150.0;
 const BEAM_STRENGTH: f32 = 20_000.0; // tune against Mass and Gravity
-const BEAM_DAMPING: f32 = 50.0;
+const BEAM_DAMPING: f32 = 300.0;
+
+const BEAM_STIFFNESS: f32 = 80.0;
+
 
 #[derive(Component)]
 pub struct TractorPlugin;

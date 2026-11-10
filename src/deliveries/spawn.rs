@@ -47,6 +47,7 @@ pub fn spawn_package(mut commands: Commands, asset_server: Res<AssetServer>) {
             [
                 WorldLayer::Floor,
                 WorldLayer::Lander,
+                WorldLayer::Target,
                 WorldLayer::Enemies,
                 WorldLayer::Props,
             ],

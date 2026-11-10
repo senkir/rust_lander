@@ -1,7 +1,7 @@
 use avian2d::prelude::Gravity;
 use bevy::app::{App, Plugin, Startup, Update};
 use bevy::math::Vec2;
-use bevy::prelude::{Component, IntoScheduleConfigs};
+use bevy::prelude::{Component, IntoScheduleConfigs, SystemSet};
 
 pub mod layers;
 pub mod spawn;
@@ -10,6 +10,9 @@ pub mod terrain;
 use config::world;
 
 use crate::config;
+
+#[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TerrainReady;
 
 #[derive(Component)]
 pub struct WorldPlugin;
@@ -22,8 +25,10 @@ impl Plugin for WorldPlugin {
                 (
                     spawn::spawn_world,
                     spawn::generate_bounds,
+
                     terrain::spawn_terrain,
                 )
+                    .in_set(TerrainReady)
                     .chain(),
             )
             .add_systems(Update, terrain::draw_terrain);

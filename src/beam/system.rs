@@ -1,5 +1,5 @@
 use crate::lander::lander::Lander;
-use crate::tractor::ship::{ShipTractor, TractorState};
+use crate::beam::ship::{ShipTractor, TractorState};
 use bevy::log::info;
 use bevy::prelude::{ButtonInput, Changed, Component, KeyCode, Query, Res, With};
 use bevy_enoki::prelude::ParticleSpawnerState;
@@ -7,7 +7,7 @@ use bevy_enoki::prelude::ParticleSpawnerState;
 #[derive(Component)]
 pub struct TractorParticle;
 
-/// determine when the key is being used for tractor beam function
+/// determine when the key is being used for beam beam function
 pub fn observe_tractor_beam_start(
     input: Res<ButtonInput<KeyCode>>,
     mut query: Query<&mut ShipTractor, With<Lander>>,
@@ -16,7 +16,7 @@ pub fn observe_tractor_beam_start(
         let Ok(mut tractor_state) = query.single_mut() else {
             return;
         };
-        info!("tractor turning on");
+        info!("beam turning on");
 
         tractor_state.state = TractorState::TurningOn;
     }
@@ -25,7 +25,7 @@ pub fn observe_tractor_beam_start(
         let Ok(mut tractor_state) = query.single_mut() else {
             return;
         };
-        info!("tractor turning off");
+        info!("beam turning off");
 
         tractor_state.state = TractorState::TurningOff;
     }
@@ -44,7 +44,7 @@ pub fn enable_tractor_beam(
         ship_tractor.state = TractorState::On;
 
         for (mut spawner_state) in particle_query.iter_mut() {
-            info!("tractor on");
+            info!("beam on");
             spawner_state.active = true;
         }
     }
@@ -62,7 +62,7 @@ pub fn disable_tractor_beam(
         ship_tractor.state = TractorState::Off;
 
         for (mut spawner_state) in particle_query.iter_mut() {
-            info!("tractor off");
+            info!("beam off");
             spawner_state.active = false;
         }
     }

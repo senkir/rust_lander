@@ -5,15 +5,16 @@ pub mod deliveries;
 pub mod lander;
 pub mod particles;
 pub mod thruster;
-pub mod tractor;
+pub mod beam;
 pub mod world;
 pub mod camera;
+pub mod delivery_target;
 
 use crate::damage::DamagePlugin;
 use crate::deliveries::DeliveriesPlugin;
 use crate::lander::LanderPlugin;
 use crate::particles::ParticlePlugin;
-use crate::tractor::TractorPlugin;
+use crate::beam::TractorPlugin;
 use crate::world::WorldPlugin;
 use avian2d::PhysicsPlugins;
 use bevy::DefaultPlugins;

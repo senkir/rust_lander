@@ -8,5 +8,6 @@ pub enum WorldLayer {
     Enemies,
     Lander,
     Package,
+    Target,
     Props,
 }
