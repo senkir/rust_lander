@@ -48,7 +48,6 @@ pub fn follow_camera(
     // Early exit if camera is already very close (within 0.5 pixels)
     let distance = player_pos.distance(camera_pos);
     if distance < 0.5 {
-        error!("Camera is too far!");
         return;
     }
 
