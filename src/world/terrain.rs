@@ -1,3 +1,4 @@
+use std::cmp::min;
 use crate::camera::camera::{MainCamera, Parallax};
 use crate::config::sprites;
 use crate::world::layers::WorldLayer;
@@ -8,8 +9,10 @@ use bevy::asset::Handle;
 use bevy::color::Color;
 use bevy::image::Image;
 use bevy::math::Vec2;
-use bevy::prelude::{AssetServer, Changed, Commands, Component, Entity, Gizmos, Query, Res, Resource, Transform, With, Without};
+use bevy::prelude::{AssetServer, Changed, Commands, Component, Entity, Gizmos, Query, Res, Resource, Transform, Window, With, Without};
 use bevy::sprite::Sprite;
+use bevy::window::PrimaryWindow;
+use rand::RngExt;
 
 /// horizontal spacing of sample points
 const STEP: f32 = 20.0;
@@ -41,6 +44,7 @@ fn raw_height(x: f32, seed: f32) -> f32 {
 pub fn spawn_background(
     mut commands: Commands,
     mut asset_server: Res<AssetServer>,
+    windows: Query<&Window, With<PrimaryWindow>>,
     world: Res<World>,
     camera: Query<Entity, With<MainCamera>>,
 ) {
@@ -50,16 +54,25 @@ pub fn spawn_background(
 
     let city: Handle<Image> = asset_server.load(sprites::SPRITE_CITY);
 
+    let window = windows.single();
+
+    let un = window.unwrap();
+    let width = un.width();
+    let height = un.height();
+
     commands.spawn((
         Sprite {
             image: city,
+            custom_size: Some(Vec2::new(width,width)),
             // custom_size: Some(Vec2::new(world.width(), world.height())),
             ..Default::default()
         },
+        //TODO: fix this
         Parallax {
            factor: Vec2::new(0.3, 0.1),
         },
-        Transform::from_xyz(world.left(), world.top(), -10.0), // behind the world, in front of the far plane
+        Transform::from_xyz(0.0,0.0, 0.0), // behind the world, in front of the far plane
+        // Transform::from_xyz(world.left(), world.top(), -10.0), // behind the world, in front of the far plane
     ));
 }
 
@@ -98,10 +111,17 @@ pub fn build_terrain(mut commands: Commands, world: Res<spawn::World>) {
 
     // sample the surface across the whole window
     let count = (world.width() / STEP).ceil() as usize + 1;
+
+    //randomize seed value
+
+    let mut rng = rand::rng();
+            let seed=rng.random_range(2.5..10.0);
     let points: Vec<Vec2> = (0..count)
         .map(|i| {
             let x = -half_w + i as f32 * STEP;
-            Vec2::new(x, BASE_Y + raw_height(x, SEED))
+
+
+            Vec2::new(x, BASE_Y + raw_height(x, seed))
         })
         .collect();
 
