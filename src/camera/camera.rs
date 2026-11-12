@@ -1,11 +1,13 @@
+use std::ops::Sub;
 use avian2d::parry::glamx::Vec2;
 use bevy::camera::{Camera, Camera2d, ClearColorConfig};
 use bevy::color::Color;
-use bevy::core_pipeline::tonemapping::DebandDither;
+use bevy::core_pipeline::tonemapping::{DebandDither, Tonemapping};
 use bevy::log::error;
 use bevy::post_process::bloom::Bloom;
-use bevy::prelude::{default, Changed, Commands, Component, Query, Res, Time, Transform, With, Without};
-use crate::camera::config;
+use bevy::prelude::{default, Changed, Commands, Component, Query, Res, Time, Transform, With, Without, ResMut, Local};
+use crate::camera::{config, trauma};
+use crate::camera::trauma::{CameraShake, ShakeOffset};
 use crate::lander::lander::Lander;
 
 /// Marker component for the main game camera.
@@ -21,17 +23,47 @@ pub fn create_camera(mut commands: Commands) {
             clear_color: ClearColorConfig::Custom(Color::BLACK),
             ..default()
         },
-        // Tonemapping::TonyMcMapface,
+        Tonemapping::TonyMcMapface,
         DebandDither::Enabled,
         Bloom::default(),
+        ShakeOffset::default(),
     ));
+}
+
+pub fn apply_shake(
+    time: Res<Time>,
+    mut shake: ResMut<CameraShake>,
+    mut cam: Query<(&mut Transform, &mut ShakeOffset), With<MainCamera>>,
+) {
+    let Ok((mut transform, mut shake_offset)) = cam.single_mut() else {
+        return;
+    };
+
+    if (shake.trauma == 0.0) {
+        return;
+    }
+
+    transform.translation -= shake_offset.offset.extend(0.0);
+
+    //this is supposed to reduce over time
+    shake.trauma = (shake.trauma - trauma::DECAY * time.delta_secs()).max(0.0);
+    let amp = shake.trauma * shake.trauma;
+    let tt = time.delta_secs() * 40.0; //frequency
+
+    let offset = Vec2::new(
+        (tt * 1.00).sin() + (tt * 2.30).sin() * 0.5,
+        (tt * 1.27 + 1.0).sin() + (tt * 2.71).sin() * 0.5,
+    ) * (amp * trauma::MAX_OFFSET / 1.5);
+
+    transform.translation = offset.extend(0.0);
+    shake_offset.offset = offset;
 }
 
 
 pub fn follow_camera(
     time: Res<Time>,
     player_query: Query<&Transform, (With<Lander>, Changed<Transform>)>,
-    mut camera_query: Query<&mut Transform, (With<MainCamera>, Without<Lander>)>,
+    mut camera_query: Query<(&mut Transform, &ShakeOffset), (With<MainCamera>, Without<Lander>)>,
 ) {
     // The Changed<Transform> filter in player_query means this system only processes
     // when the player has moved - Bevy filters it at the query level
@@ -39,11 +71,13 @@ pub fn follow_camera(
         return;
     };
 
-    let Ok(mut camera_transform) = camera_query.single_mut() else {
+    let Ok((mut camera_transform, shake_offset)) = camera_query.single_mut() else {
         return;
     };
 
     let player_pos = player_transform.translation.truncate();
+    //shift back from the shake position
+    camera_transform.translation -= shake_offset.offset.extend(0.0);
     let camera_pos = camera_transform.translation.truncate();
 
     // Early exit if camera is already very close (within 0.5 pixels)

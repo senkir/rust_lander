@@ -3,7 +3,7 @@ use bevy::prelude::{Commands, Resource};
 /// game overall score
 #[derive(Resource, Copy, Clone, Debug)]
 pub struct Score {
-    pub score: u32,
+    pub score: i32,
     pub packages: u32
 }
 

@@ -14,7 +14,7 @@ use bevy::log::error;
 use bevy::math::Vec3;
 use bevy::prelude::{Color, Commands, Entity, Image, MessageReader, MessageWriter, Query, Res, ResMut, TextureAtlas, TextureAtlasLayout, Transform, UVec2, Vec2, With, default, info};
 use bevy::sprite::Sprite;
-
+use crate::damage::damage_stage::DamageStage;
 
 pub fn spawn_lander(
     mut commands: Commands,
@@ -45,14 +45,12 @@ fn do_spawn_lander(
         return;
     };
 
-
-    info!("spawn lander");
-
     commands.spawn((
         // marker obj
         Lander,
         ShipStatus::new(),
-        Health::new(100),
+        Health::new(lander::LANDER_HEALTH),
+        DamageStage::default(),
         // position in space
         Transform::from_xyz(
             lander::LANDER_START_X,
@@ -72,12 +70,7 @@ fn do_spawn_lander(
         spaceship.sprite(
             0
         ),
-        // Sprite {
-        //     image: spaceship,
-        //     custom_size: Some(Vec2::new(lander::LANDER_SIZE, lander::LANDER_SIZE)),
-        //     ..default()
-        // },
-        Collider::rectangle(lander::LANDER_SIZE, lander::LANDER_SIZE), //TODO: mark position somehow
+        Collider::rectangle(lander::LANDER_SIZE, lander::LANDER_SIZE),
         CollisionLayers::new(
             [WorldLayer::Lander],
             [
@@ -92,9 +85,9 @@ fn do_spawn_lander(
 }
 
 pub fn update_lander_frame(
-    mut query: Query<(&Health, &ShipStatus, &mut Sprite), With<Lander>>,
+    mut query: Query<(&Health, &DamageStage, &ShipStatus, &mut Sprite), With<Lander>>,
 ) {
-    let Ok((health, status, mut sprite)) = query.single_mut() else {
+    let Ok((health, damage_stage, status, mut sprite)) = query.single_mut() else {
         return;
     };
 
@@ -102,7 +95,7 @@ pub fn update_lander_frame(
         return;
     };
 
-    let index = health::damage_stage(health);
+    let index = damage_stage.damage_stage(health);
     if atlas.index != index {
         atlas.index = index;
     }
@@ -143,5 +136,30 @@ pub fn observe_respawn_ready(
         &sprite_atlas_handles,
         query
     );
+    }
+}
+
+
+#[cfg(test)]
+mod Test {
+    use super::*;
+
+    #[test]
+    fn test_fraction() {
+        let mut health = Health::default();
+        assert_eq!(health.fraction(), 1.0);
+    }
+    #[test]
+    fn test_mark_for_death() {
+        let mut health = Health::default();
+        health.mark_for_death();
+        assert!(health.is_dying());
+    }
+
+    #[test]
+    fn test_dead_not_dying() {
+        let mut health = Health::default();
+        let result = health.is_dead_not_dying();
+        assert_eq!(result, false);
     }
 }

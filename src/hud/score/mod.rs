@@ -1,6 +1,6 @@
-use crate::score::display::ScoreUpdate;
-use crate::score::score::Score;
-use bevy::app::{App, Startup};
+use crate::hud::score::display::ScoreUpdate;
+use crate::hud::score::score::Score;
+use bevy::app::App;
 use bevy::prelude::{Plugin, Update};
 
 pub mod display;

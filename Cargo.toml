@@ -8,7 +8,7 @@ edition = "2024"
 [dependencies]
 bevy = { version = "0.20.1",
     default-features = false,
-    features = ["2d", "ui", "file_watcher"] }
+    features = ["2d", "ui", "file_watcher", "tonemapping_luts", "zstd_rust"] }
 
 bevy_ecs_tilemap = { version = "0.20.0", features = ["atlas"] }
 

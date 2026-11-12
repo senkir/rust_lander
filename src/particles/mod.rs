@@ -1,4 +1,4 @@
-use crate::particles::materials::{FireParticleMaterial, TractorBeamMaterial, TractorSparkleMaterial};
+use crate::particles::materials::{FireParticleMaterial, SmokeParticleMaterial, TractorBeamMaterial, TractorSparkleMaterial};
 use crate::particles::materials::SideJetMaterial;
 use bevy::app::App;
 use bevy::prelude::{Component, Plugin, Update};
@@ -19,6 +19,11 @@ pub mod particles {
     pub const PARTICLE_LEFT_THRUSTER: &str = "particles/side_thrust_left.ron";
     pub const PARTICLE_REVERSE_THRUSTER: &str = "particles/reverse_thrust.ron";
     
+    pub const PARTICLE_EXPLOSION_FIRE: &str = "particles/explosion_fire.ron";
+    pub const PARTICLE_EXPLOSION_SMOKE: &str = "particles/smoke_large.ron";
+    pub const PARTICLE_EXPLOSION_SMOKE_SMALL: &str = "particles/smoke_large.ron";
+    pub const PARTICLE_EXPLOSION_SPARKS: &str = "particles/explosion_sparks.ron";
+    
 }
 
 mod config {
@@ -34,6 +39,7 @@ impl Plugin for ParticlePlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(EnokiPlugin)
             .add_plugins(Particle2dMaterialPlugin::<FireParticleMaterial>::default())
+            .add_plugins(Particle2dMaterialPlugin::<SmokeParticleMaterial>::default())
             .add_plugins(Particle2dMaterialPlugin::<SideJetMaterial>::default())
             .add_plugins(Particle2dMaterialPlugin::<TractorBeamMaterial>::default())
             .add_plugins(Particle2dMaterialPlugin::<TractorSparkleMaterial>::default())

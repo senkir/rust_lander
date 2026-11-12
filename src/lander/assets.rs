@@ -57,9 +57,19 @@ pub fn preload_sprite_maps(
         &mut texture_atlas_layouts,
         sprites::SPRITE_PACKAGE,
         64,
-        4,
+        14,
         1,
     );
+
+    preload_texture_map(
+        &asset_server,
+        &mut atlases,
+        &mut texture_atlas_layouts,
+        sprites::SP_TARGET_ARROW,
+        32,
+        9,
+        1
+    )
 }
 
 fn preload_texture_map(

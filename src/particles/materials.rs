@@ -15,6 +15,17 @@ impl Particle2dMaterial for FireParticleMaterial {
     }
 }
 
+#[derive(AsBindGroup, Asset, TypePath, Clone, Default)]
+pub struct SmokeParticleMaterial {
+    #[uniform(0)] pub color: LinearRgba,
+}
+
+impl Particle2dMaterial for SmokeParticleMaterial {
+    fn fragment_shader() -> bevy::shader::ShaderRef {
+        "materials/smoke_shader.wesl".into()
+    }
+}
+
 #[derive(AsBindGroup, Asset, TypePath, Clone)]
 pub struct SideJetMaterial {
     #[uniform(0)]

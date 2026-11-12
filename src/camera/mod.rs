@@ -1,11 +1,12 @@
+use crate::camera::trauma::CameraShake;
 use bevy::app::{App, Plugin, Startup};
 use bevy::prelude::{Component, Update};
 
 pub mod camera;
+pub mod trauma;
 
 #[derive(Component)]
 pub struct CameraPlugin;
-
 
 pub mod config {
     /// How fast the camera interpolates toward the player (higher = snappier)
@@ -17,8 +18,14 @@ pub mod config {
 
 impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, camera::create_camera)
-            .add_systems(Update, (camera::follow_camera,
-            camera::apply_parallax));
+        app.insert_resource(CameraShake::default());
+        app.add_systems(Startup, camera::create_camera).add_systems(
+            Update,
+            (
+                camera::follow_camera,
+                camera::apply_parallax,
+                camera::apply_shake,
+            ),
+        );
     }
 }

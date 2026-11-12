@@ -1,15 +1,14 @@
-use std::cmp::min;
 use crate::camera::camera::{MainCamera, Parallax};
 use crate::config::sprites;
+use crate::theme::ThemeColors;
 use crate::world::layers::WorldLayer;
 use crate::world::spawn;
 use crate::world::spawn::World;
 use avian2d::prelude::{Collider, CollisionLayers, RigidBody};
 use bevy::asset::Handle;
-use bevy::color::Color;
 use bevy::image::Image;
 use bevy::math::Vec2;
-use bevy::prelude::{AssetServer, Changed, Commands, Component, Entity, Gizmos, Query, Res, Resource, Transform, Window, With, Without};
+use bevy::prelude::{AssetServer, Commands, Component, Entity, Gizmos, Query, Res, Resource, Transform, Window, With};
 use bevy::sprite::Sprite;
 use bevy::window::PrimaryWindow;
 use rand::RngExt;
@@ -24,11 +23,56 @@ const SEED: f32 = 1.7;
 const PAD_WIDTH_STEPS: f32 = 6.0; // pad is 6 * STEP = 120 px wide
 const PAD_BLEND: f32 = 5.0 * STEP; // ramp length either side of the pad
 
+/// line curve representing ground plane
 #[derive(Resource)]
 pub struct Terrain {
-    pub points: Vec<Vec2>,
+    base_y: f32,
+    points: Vec<Vec2>,
 }
 
+#[derive(Component)]
+pub struct TerrainMarker;
+
+impl Default for Terrain {
+    fn default() -> Self {
+        Self {
+            base_y: BASE_Y,
+            points: Vec::new(),
+        }
+    }
+}
+
+impl Terrain {
+    pub fn new(points: Vec<Vec2>) -> Self {
+        Self {
+            points,
+            ..Default::default()
+        }
+    }
+
+    pub fn size(&self) -> u32 {
+        self.points.len() as u32
+    }
+
+    pub fn y_at_x(&self, target_x: f32) -> f32 {
+        let mut found: f32 = 0.0;
+        let mut last_y: f32 = 0.0;
+        for point in self.points.iter() {
+            if point.x > target_x {
+                //past point
+                point.y;
+                if (last_y > point.y) {
+                    found = last_y;
+                } else {
+                    found = point.y;
+                }
+                break;
+            }
+            last_y = point.y;
+        }
+        found
+    }
+}
 pub struct Pad {
     pub x: f32,
     pub y: f32,
@@ -57,22 +101,20 @@ pub fn spawn_background(
     let window = windows.single();
 
     let un = window.unwrap();
-    let width = un.width();
-    let height = un.height();
+    let width = world.width();
+    let height = world.height();
 
     commands.spawn((
         Sprite {
             image: city,
-            custom_size: Some(Vec2::new(width,width)),
-            // custom_size: Some(Vec2::new(world.width(), world.height())),
+            custom_size: Some(Vec2::new(width, height)),
             ..Default::default()
         },
         //TODO: fix this
         Parallax {
-           factor: Vec2::new(0.3, 0.1),
+            factor: Vec2::new(0.3, 0.1),
         },
-        Transform::from_xyz(0.0,0.0, 0.0), // behind the world, in front of the far plane
-        // Transform::from_xyz(world.left(), world.top(), -10.0), // behind the world, in front of the far plane
+        Transform::from_xyz(0.0, 0.0, 0.0), // behind the world, in front of the far plane
     ));
 }
 
@@ -93,6 +135,7 @@ pub fn spawn_terrain_entities(mut commands: Commands, terrain: Res<Terrain>) {
         Transform::default(),
         RigidBody::Static,
         Collider::compound(shapes),
+        TerrainMarker,
         CollisionLayers::new(
             [WorldLayer::Floor],
             [
@@ -115,23 +158,26 @@ pub fn build_terrain(mut commands: Commands, world: Res<spawn::World>) {
     //randomize seed value
 
     let mut rng = rand::rng();
-            let seed=rng.random_range(2.5..10.0);
+    let seed = rng.random_range(2.5..10.0);
     let points: Vec<Vec2> = (0..count)
         .map(|i| {
             let x = -half_w + i as f32 * STEP;
-
 
             Vec2::new(x, BASE_Y + raw_height(x, seed))
         })
         .collect();
 
-    commands.insert_resource(Terrain { points });
+    commands.insert_resource(Terrain::new(points));
 }
 
-pub fn draw_terrain(mut gizmos: Gizmos, terrain: Option<Res<Terrain>>) {
+pub fn draw_terrain(
+    mut gizmos: Gizmos,
+    terrain: Option<Res<Terrain>>,
+    theme_colors: Res<ThemeColors>,
+) {
     let Some(terrain) = terrain else {
         return;
     };
     //TODO: change from a gizmo to an asset
-    gizmos.linestrip_2d(terrain.points.iter().copied(), Color::srgb(0.2, 0.7, 0.9));
+    gizmos.linestrip_2d(terrain.points.iter().copied(), theme_colors.surface);
 }

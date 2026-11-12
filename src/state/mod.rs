@@ -8,12 +8,14 @@ pub mod button;
 
 use bevy::prelude::*;
 
-use crate::{damage, deliveries, delivery_target, lander, score};
-use crate::world;
-pub use game_state::GameState;
+use crate::deliveries::landing_pad;
+use crate::hud::score;
 use crate::lander::assets;
 use crate::lander::assets::SpriteAtlasHandles;
 use crate::state::preload::PendingAssets;
+use crate::world;
+use crate::{damage, deliveries, lander};
+pub use game_state::GameState;
 
 pub struct StatePlugin;
 
@@ -62,9 +64,9 @@ impl Plugin for StatePlugin {
                     loading::despawn_loading_screen,
                     lander::spawn::spawn_lander,
                     deliveries::spawn::spawn_package,
-                    delivery_target::spawn::spawn_target,
+                    landing_pad::spawn::spawn_target,
                     score::display::spawn_score,
-                    damage::bar::spawn_lander_health_bar
+                    damage::health_bar::spawn_lander_health_bar
                 ),
             )
             // Pause state systems

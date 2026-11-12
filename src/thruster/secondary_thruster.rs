@@ -45,7 +45,7 @@ pub fn handle_rotation_thrust(
 fn apply_side_thrust(forces: &mut ForcesItem, angle_offset_degrees: f32) {
     //TODO: calculate force from orientation
     //for now just always apply a vertical thrust
-    let thruster_force = lander::THRUSTER_FORCE; //TODO: is this too much?
+    let thruster_force = lander::THRUSTER_FORCE_SIDE; //TODO: is this too much?
 
     //shift 90 degrees
     let rot = (forces.rotation().as_degrees() + angle_offset_degrees).to_radians();

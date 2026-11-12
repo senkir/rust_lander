@@ -56,7 +56,7 @@ fn apply_forward_thrust(forces: &mut ForcesItem) {
 fn apply_backward_thrust(forces: &mut ForcesItem) {
     //TODO: calculate force from orientation
     //for now just always apply a vertical thrust
-    let thruster_force = lander::THRUSTER_FORCE;
+    let thruster_force = lander::THRUSTER_FORCE_REVERSE;
 
     let rot = forces.rotation().as_radians();
 

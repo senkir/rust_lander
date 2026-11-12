@@ -39,6 +39,7 @@ pub(crate) fn for_each_collision(
     }
 }
 
+/// match if both objects match
 pub fn match_pair(
     a: Entity,
     b: Entity,

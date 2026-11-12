@@ -24,9 +24,7 @@ pub fn button(text: &str) -> impl Bundle {
         BackgroundColor(NORMAL_BUTTON),
         children![(
             Text::new(text),
-            // TextFont::default(),
             TextColor(Color::srgb(0.9, 0.9, 0.9)),
-            // TextShadow::default(),
         )],
     )
 }

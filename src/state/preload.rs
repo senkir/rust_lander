@@ -18,6 +18,11 @@ pub fn start_preload(server: Res<AssetServer>, mut pending: ResMut<PendingAssets
         config::sprites::SPRITE_PACKAGE,
         config::sprites::SPRITE_CITY,
         config::sprites::SPRITE_LANDER,
+        config::sprites::SPRITE_ARROW,
+        config::sprites::SPRITE_LASER,
+        config::sprites::SPRITE_LIGHT,
+        config::sprites::SP_TARGET_ARROW,
+        config::sprites::SP_LANDING_PAD,
     ] {
         push_asset::<Image>(&server, &mut pending, path);
     }
@@ -30,6 +35,8 @@ pub fn start_preload(server: Res<AssetServer>, mut pending: ResMut<PendingAssets
         particles::PARTICLE_RIGHT_THRUSTER,
         particles::PARTICLE_TRACTOR_BEAM,
         particles::PARTICLE_TRACTOR_BEAM_SPARKLE,
+        particles::PARTICLE_EXPLOSION_FIRE,
+        particles::PARTICLE_EXPLOSION_SPARKS,
     ] {
         push_asset::<Particle2dEffect>(&server, &mut pending, path);
     }
