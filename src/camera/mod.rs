@@ -18,6 +18,7 @@ pub mod config {
 impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, camera::create_camera)
-            .add_systems(Update, camera::follow_camera);
+            .add_systems(Update, (camera::follow_camera,
+            camera::apply_parallax));
     }
 }

@@ -4,8 +4,6 @@ use bevy::prelude::Component;
 pub enum TractorState {
     #[default]
     Off,
-    TurningOn,
-    TurningOff,
     On
 }
 

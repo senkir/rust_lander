@@ -1,26 +1,35 @@
+use crate::state::GameState;
 use crate::thruster::{main_thruster, secondary_thruster};
-use bevy::app::{App, Startup};
-use bevy::prelude::{Component, Plugin, Update};
+use bevy::app::App;
+use bevy::prelude::{Component, IntoScheduleConfigs, Plugin, Update, in_state};
+use crate::lander::respawn::{RespawnReadyMessage, RespawnBeginMessage};
 
-pub mod lander;
-pub mod spawn;
 pub mod debug;
-pub mod ship;
 pub mod input;
+pub mod lander;
+pub mod ship;
+pub mod spawn;
+pub mod assets;
+pub mod respawn;
 
 #[derive(Component)]
 pub struct LanderPlugin;
 
 impl Plugin for LanderPlugin {
     fn build(&self, app: &mut App) {
-        //TODO: create systems here
-        app.add_systems(Startup, spawn::spawn_lander)
-            .add_systems(Update, (
-                input::observe_thruster_pressed,
-                main_thruster::handle_thrust_active_state,
-                secondary_thruster::handle_rotation_thrust,
-                debug::debug_reset_sprite,
-                debug::debug_show_thrust
-                ));
+        app.add_message::<RespawnBeginMessage>();
+        app.add_message::<RespawnReadyMessage>();
+        app.add_systems(Update, (debug::debug_reset_sprite))
+            .add_systems(
+                Update,
+                (
+                    input::observe_thruster_pressed,
+                    (spawn::observe_respawn_ready,
+                    spawn::observe_respawn_start).chain(),
+                    main_thruster::handle_thrust_active_state,
+                    secondary_thruster::handle_rotation_thrust,
+                )
+                    .run_if(in_state(GameState::Playing)),
+            );
     }
 }

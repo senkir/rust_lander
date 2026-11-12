@@ -1,6 +1,8 @@
-use bevy::app::{App, Startup};
-use bevy::prelude::{Component, IntoScheduleConfigs, Plugin};
-use crate::world::TerrainReady;
+use crate::delivery_target::collision;
+use crate::delivery_target::collision::PackageDeliveredTrigger;
+use bevy::app::App;
+use bevy::prelude::{Component, Plugin, Update};
+use crate::{deliveries, delivery_target};
 
 pub mod delivery;
 pub mod spawn;
@@ -10,13 +12,15 @@ pub struct DeliveriesPlugin;
 
 impl Plugin for DeliveriesPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, spawn::spawn_package)
-            .add_systems(Startup, 
-                         crate::delivery_target::spawn::spawn_target.after(TerrainReady))
-        ;
+        app.add_message::<PackageDeliveredTrigger>()
+            .add_message::<spawn::SpawnPackageRequest>()
+            .add_systems(Update, (
+                collision::observe_package_collisions,
+            deliveries::spawn::despawn_package,
+                spawn::handle_spawn_requests
+            ));
     }
 }
-
 
 mod config {
 

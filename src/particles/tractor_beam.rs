@@ -1,6 +1,6 @@
 use crate::lander::lander::Lander;
 use crate::particles::materials::{TractorBeamMaterial, TractorSparkleMaterial};
-use crate::beam::system::TractorParticle;
+use crate::beam::input::TractorParticle;
 use bevy::asset::{AssetServer, Assets};
 use bevy::color::LinearRgba;
 use bevy::prelude::{Add, Commands, On, Res, ResMut, Transform, default};
@@ -25,7 +25,7 @@ pub fn spawn_tractor_beam(
             TractorBeamMaterial { tint: LinearRgba::new(1.0, 1.0, 1.0, 0.5) }   // 50 percent
         )),
         //specific effect
-        ParticleEffectHandle(server.load(super::config::PARTICLE_TRACTOR_BEAM)),
+        ParticleEffectHandle(server.load(super::particles::PARTICLE_TRACTOR_BEAM)),
         //not active yet
         ParticleSpawnerState {
             active: false,
@@ -41,7 +41,7 @@ pub fn spawn_tractor_beam(
         ParticleSpawner(sparkle.add(TractorSparkleMaterial::default())),
         // ParticleSpawner::default(),
         //specific effect
-        ParticleEffectHandle(server.load(super::config::PARTICLE_TRACTOR_BEAM_SPARKLE)),
+        ParticleEffectHandle(server.load(super::particles::PARTICLE_TRACTOR_BEAM_SPARKLE)),
         //not active yet
         ParticleSpawnerState {
             active: false,

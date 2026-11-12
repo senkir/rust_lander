@@ -3,7 +3,7 @@ use bevy::prelude::{Component, IntoScheduleConfigs};
 
 pub mod attraction;
 pub mod ship;
-pub mod system;
+pub mod input;
 
 const HOLD_OFFSET: f32 = 45.0;      // lander half-size + package half-size + margin
 
@@ -22,9 +22,7 @@ impl Plugin for TractorPlugin {
         app.add_systems(
             Update,
             (
-                system::observe_tractor_beam_start,
-                system::enable_tractor_beam,
-                system::disable_tractor_beam,
+                input::observe_tractor_beam_start,
                 attraction::apply_tractor_force,
             )
                 .chain(),

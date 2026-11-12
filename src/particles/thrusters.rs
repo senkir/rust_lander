@@ -55,7 +55,7 @@ fn spawn_emitter_internal(
         //base spawner definition
         ParticleSpawner(materials.add(FireParticleMaterial::default())),
         //specific effect
-        ParticleEffectHandle(server.load(super::config::PARTICLE_MAIN_THRUSTER)),
+        ParticleEffectHandle(server.load(super::particles::PARTICLE_MAIN_THRUSTER)),
         //not active yet
         ParticleSpawnerState {
             active: false,
@@ -79,7 +79,7 @@ fn spawn_emitter_core_internal(
         //base spawner definition
         ParticleSpawner(materials.add(FireParticleMaterial::default())),
         //specific effect
-        ParticleEffectHandle(server.load(super::config::PARTICLE_MAIN_THRUSTER_CORE)),
+        ParticleEffectHandle(server.load(super::particles::PARTICLE_MAIN_THRUSTER_CORE)),
         //not active yet
         ParticleSpawnerState {
             active: false,
@@ -107,11 +107,11 @@ fn spawn_emitter_small_internal(
         ParticleSpawner(materials.add(SideJetMaterial::default())),
         //specific effect
         ParticleEffectHandle(if (thrust_type == ThrustType::Right) {
-            server.load(super::config::PARTICLE_LEFT_THRUSTER)
+            server.load(super::particles::PARTICLE_LEFT_THRUSTER)
         } else if (thrust_type == ThrustType::Left) {
-            server.load(super::config::PARTICLE_RIGHT_THRUSTER)
+            server.load(super::particles::PARTICLE_RIGHT_THRUSTER)
         } else if (thrust_type == ThrustType::Reverse) {
-            server.load(super::config::PARTICLE_REVERSE_THRUSTER)
+            server.load(super::particles::PARTICLE_REVERSE_THRUSTER)
         } else {
             panic!("ThrustEmitter does not support thrust type")
         }),
@@ -132,6 +132,7 @@ pub fn spawn_emitter(
     mut side_material: ResMut<Assets<SideJetMaterial>>,
     server: Res<AssetServer>,
 ) {
+    info!("Spawning emitter on lander");
     // let mat = materials.add(ColorParticle2dMaterial::new(
     //     server.load("flame.png"),
     //     1, 1, // sprite sheet columns, rows (1,1 for a single image)
@@ -194,7 +195,9 @@ pub fn update_emitter(
         //toggle the large thruster
         match (thrust_emitter.thrust_type) {
             ThrustType::Large => {
-                if (!spawner_state.active && ship_status.thrust_direction == InputDirection::Forward) {
+                if (!spawner_state.active
+                    && ship_status.thrust_direction == InputDirection::Forward)
+                {
                     spawner_state.active = true;
                 } else {
                     spawner_state.active = false;

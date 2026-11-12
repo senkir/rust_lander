@@ -1,4 +1,10 @@
 
+pub mod sprites {
+    pub const SPRITE_LANDER: &str = "lander_sprite.png";
+    
+    pub const SPRITE_PACKAGE: &str = "cow_sprite.png";
+    pub const SPRITE_CITY: &str = "city_bg.png";
+}
 pub mod world {
     pub const GRAVITY: f32 = 100.0;
     
@@ -9,9 +15,17 @@ pub mod world {
     pub const WORLD_SIZE: f32 = 50.0;
 
     pub const WORLD_SEGMENTS: usize = 5;
+    
+}
+
+pub mod hud {
+    pub const HEALTH_POSITION_Y : f32 = 10.0;
+    pub const SCORE_POSITION_Y : f32 = 30.0;
+    pub const TIMER_POSITION_Y : f32 = 60.0;
 }
 
 pub mod lander {
+    
     pub const MASS: f32 = 500.0;
     pub const LANDER_SIZE: f32 = 50.0;
 

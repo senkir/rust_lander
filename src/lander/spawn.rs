@@ -1,21 +1,34 @@
-use crate::config::lander;
+use crate::beam::ship::{ShipTractor, TractorState};
+use crate::config;
+use crate::config::{lander, sprites};
+use crate::damage::health;
 use crate::damage::health::Health;
-use crate::lander::ship::ShipStatus;
+use crate::lander::assets::{SpriteAtlasHandles, TileMapHandles};
 use crate::lander::lander::Lander;
+use crate::lander::respawn::{RespawnReadyMessage, RespawnBeginMessage};
+use crate::lander::ship::ShipStatus;
 use crate::world::layers::WorldLayer;
 use avian2d::prelude::{AngularDamping, Collider, CollisionEventsEnabled, CollisionLayers, LinearDamping, Mass, RigidBody};
-use bevy::asset::{AssetServer, Handle};
+use bevy::asset::{AssetServer, Assets, Handle};
 use bevy::log::error;
 use bevy::math::Vec3;
-use bevy::prelude::{
-    Color, Commands, Entity, Image, Query, Res, Transform, Vec2, With, default, info,
-};
+use bevy::prelude::{Color, Commands, Entity, Image, MessageReader, MessageWriter, Query, Res, ResMut, TextureAtlas, TextureAtlasLayout, Transform, UVec2, Vec2, With, default, info};
 use bevy::sprite::Sprite;
-use crate::beam::ship::{ShipTractor, TractorState};
+
 
 pub fn spawn_lander(
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
+    sprite_atlas_handles: Res<SpriteAtlasHandles>,
+    query: Query<Entity, With<Lander>>) {
+
+    do_spawn_lander(
+        &mut commands, &sprite_atlas_handles, query
+    );
+}
+
+fn do_spawn_lander(
+    commands: &mut Commands,
+    sprite_atlas_handles: &SpriteAtlasHandles,
     query: Query<Entity, With<Lander>>,
 ) {
     let Err(_) = query.single() else {
@@ -24,7 +37,14 @@ pub fn spawn_lander(
     };
 
     //TC: no sprite sheets here just a flat image
-    let spaceship: Handle<Image> = asset_server.load("noun_spaceship.png");
+
+    //TODO: load this as a sprite map
+    //TODO: is this clone efficient? who knows
+    let Some(spaceship) = sprite_atlas_handles.get(sprites::SPRITE_LANDER) else {
+        error!("failed to get sprite spaceship!");
+        return;
+    };
+
 
     info!("spawn lander");
 
@@ -49,11 +69,14 @@ pub fn spawn_lander(
         CollisionEventsEnabled,
         ShipTractor::default(),
         Mass(lander::MASS),
-        Sprite {
-            image: spaceship,
-            custom_size: Some(Vec2::new(lander::LANDER_SIZE, lander::LANDER_SIZE)),
-            ..default()
-        },
+        spaceship.sprite(
+            0
+        ),
+        // Sprite {
+        //     image: spaceship,
+        //     custom_size: Some(Vec2::new(lander::LANDER_SIZE, lander::LANDER_SIZE)),
+        //     ..default()
+        // },
         Collider::rectangle(lander::LANDER_SIZE, lander::LANDER_SIZE), //TODO: mark position somehow
         CollisionLayers::new(
             [WorldLayer::Lander],
@@ -66,4 +89,59 @@ pub fn spawn_lander(
             ],
         ),
     ));
+}
+
+pub fn update_lander_frame(
+    mut query: Query<(&Health, &ShipStatus, &mut Sprite), With<Lander>>,
+) {
+    let Ok((health, status, mut sprite)) = query.single_mut() else {
+        return;
+    };
+
+    let Some(atlas) = sprite.texture_atlas.as_mut() else {
+        return;
+    };
+
+    let index = health::damage_stage(health);
+    if atlas.index != index {
+        atlas.index = index;
+    }
+}
+
+pub fn observe_respawn_start(
+    mut commands: Commands,
+    query: Query<Entity, With<Lander>>,
+    mut reader: MessageReader<RespawnBeginMessage>,
+    mut writer: MessageWriter<RespawnReadyMessage>
+) {
+    //FIXME: there's probably a cleaner way to do this but oh well
+
+    for event in reader.read() {
+        //only get here when there's an event to trigger
+
+        let Ok(entity) = query.single() else {
+            error!("there is no lander!");
+            return;
+        };
+
+        commands.entity(entity).despawn();
+
+        writer.write(RespawnReadyMessage);
+    }
+}
+
+pub fn observe_respawn_ready(
+    mut commands: Commands,
+    mut reader: MessageReader<RespawnReadyMessage>,
+    sprite_atlas_handles: Res<SpriteAtlasHandles>,
+    query: Query<Entity, With<Lander>>,
+) {
+
+    for event in reader.read() {
+    do_spawn_lander(
+        &mut commands,
+        &sprite_atlas_handles,
+        query
+    );
+    }
 }

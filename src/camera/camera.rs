@@ -1,3 +1,4 @@
+use avian2d::parry::glamx::Vec2;
 use bevy::camera::{Camera, Camera2d, ClearColorConfig};
 use bevy::color::Color;
 use bevy::core_pipeline::tonemapping::DebandDither;
@@ -59,4 +60,21 @@ pub fn follow_camera(
     camera_transform.translation.x = new_pos.x.round();
     camera_transform.translation.y = new_pos.y.round();
     camera_transform.translation.z = config::CAMERA_Z;
+}
+
+#[derive(Component)]
+pub struct Parallax {
+    pub factor: Vec2, // 0.0 = fixed in the world, 1.0 = fixed on screen
+}
+
+
+pub fn apply_parallax(
+    camera: Query<&Transform, (With<MainCamera>, Changed<Transform>)>,
+    mut layers: Query<(&mut Transform, &Parallax), Without<MainCamera>>,
+) {
+    let Ok(cam) = camera.single() else { return; };
+    for (mut t, p) in &mut layers {
+        t.translation.x = cam.translation.x * p.factor.x;
+        t.translation.y = cam.translation.y * p.factor.y;
+    }
 }

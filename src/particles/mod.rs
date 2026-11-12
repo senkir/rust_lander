@@ -9,7 +9,8 @@ pub mod materials;
 pub mod thrusters;
 pub mod tractor_beam;
 
-mod config {
+
+pub mod particles {
     pub const PARTICLE_TRACTOR_BEAM: &str = "particles/tractor_beam.ron";
     pub const PARTICLE_TRACTOR_BEAM_SPARKLE: &str = "particles/tractor_beam_sparkle.ron";
     pub const PARTICLE_MAIN_THRUSTER: &str = "particles/main_thrust.ron";
@@ -18,6 +19,10 @@ mod config {
     pub const PARTICLE_LEFT_THRUSTER: &str = "particles/side_thrust_left.ron";
     pub const PARTICLE_REVERSE_THRUSTER: &str = "particles/reverse_thrust.ron";
     
+}
+
+mod config {
+
     pub const TRACTOR_BEAM_Z_OFFSET: f32 = 0.1;
     pub const ENGINE_Z_OFFSET: f32 = 0.3;
 }

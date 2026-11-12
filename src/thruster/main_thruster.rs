@@ -8,6 +8,7 @@ use bevy::input::ButtonInput;
 use bevy::log::{error, info};
 use bevy::prelude::{Changed, Component, KeyCode, Query, Res, Single, Transform, Vec2, With};
 use crate::lander::input::InputDirection;
+use crate::thruster::math;
 
 #[derive(Component)]
 pub struct ThrustActiveState;
@@ -46,7 +47,7 @@ fn apply_forward_thrust(forces: &mut ForcesItem) {
     let rot = forces.rotation().as_radians();
 
     //TODO: run this calculation
-    let vector = calculate_thrust_vector(thruster_force, rot);
+    let vector = math::calculate_thrust_vector(thruster_force, rot);
 
     forces.apply_linear_acceleration(vector);
 }
@@ -59,16 +60,11 @@ fn apply_backward_thrust(forces: &mut ForcesItem) {
 
     let rot = forces.rotation().as_radians();
 
-    //TODO: run this calculation
-    let vector = calculate_thrust_vector(thruster_force, rot);
+    let vector = math::calculate_thrust_vector(thruster_force, rot);
 
     forces.apply_linear_acceleration(-vector);
 }
 
-fn calculate_thrust_vector(thruster_force: f32, rotation_radians: f32) -> Vec2 {
-    //TODO: run this calculation
-    Vec2::new(-rotation_radians.sin(), rotation_radians.cos()) * thruster_force
-}
 
 #[cfg(test)]
 mod tests {
@@ -80,7 +76,7 @@ mod tests {
     fn calculate_thrust_90() {
         let test: f32 = 90.0;
         let rad = test.to_radians();
-        let result = calculate_thrust_vector(1.0, rad);
+        let result = math::calculate_thrust_vector(1.0, rad);
         assert!(result.x.abs() == 1.0, "not equal {}", result.x.abs());
         assert!(result.y.abs() < 1e-6, "not equal {}", result.y.abs());
     }
@@ -89,7 +85,7 @@ mod tests {
     fn calculate_thrust_0() {
         let test: f32 = 0.0;
         let rad = test.to_radians();
-        let result = calculate_thrust_vector(1.0, rad);
+        let result = math::calculate_thrust_vector(1.0, rad);
         assert!(result.x.abs() == 0.0, "not equal {}", result.x.abs()); //close to 0
         assert!(result.y.abs() == 1.0, "not equal {}", result.y.abs());
     }

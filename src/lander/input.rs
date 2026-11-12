@@ -3,27 +3,29 @@ use crate::lander::ship::ShipStatus;
 use bevy::input::ButtonInput;
 use bevy::prelude::{Component, KeyCode, Query, Res, With};
 use std::fmt::Display;
+use crate::controls::controls::ControlsResource;
 
-fn button_to_input_direction(input: &ButtonInput<KeyCode>) -> InputDirection {
-    if input.pressed(KeyCode::ArrowUp) {
-        return InputDirection::Forward;
-    } else if input.pressed(KeyCode::ArrowDown) {
-        return InputDirection::Backward;
-    } else if input.pressed(KeyCode::ArrowLeft) {
-        return InputDirection::Left;
-    } else if input.pressed(KeyCode::ArrowRight) {
-        return InputDirection::Right;
+fn button_to_input_direction(input: &ButtonInput<KeyCode>, controls: &ControlsResource) -> InputDirection {
+    return if input.pressed(controls.main_engine) {
+        InputDirection::Forward
+    } else if input.pressed(controls.reverse_engine) {
+        InputDirection::Backward
+    } else if input.pressed(controls.left_engine) {
+        InputDirection::Left
+    } else if input.pressed(controls.right_engine) {
+        InputDirection::Right
     } else {
-        return InputDirection::None;
+        InputDirection::None
     }
 }
 
 pub fn observe_thruster_pressed(
     input: Res<ButtonInput<KeyCode>>,
+    controls: Res<ControlsResource>,
     mut query: Query<(&mut ShipStatus), With<Lander>>,
 ) {
     for (mut ship_status) in query.iter_mut() {
-        let direction = button_to_input_direction(&input);
+        let direction = button_to_input_direction(&input, &controls);
 
         match direction {
             InputDirection::Forward => {

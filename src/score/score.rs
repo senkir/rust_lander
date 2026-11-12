@@ -15,9 +15,3 @@ impl Default for Score {
         }
     }
 }
-
-pub fn generate_score(
-    mut commands: Commands,
-) {
-    commands.insert_resource(Score::default());
-}

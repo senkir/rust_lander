@@ -1,9 +1,15 @@
+use crate::camera::camera::{MainCamera, Parallax};
+use crate::config::sprites;
 use crate::world::layers::WorldLayer;
 use crate::world::spawn;
+use crate::world::spawn::World;
 use avian2d::prelude::{Collider, CollisionLayers, RigidBody};
+use bevy::asset::Handle;
 use bevy::color::Color;
+use bevy::image::Image;
 use bevy::math::Vec2;
-use bevy::prelude::{Commands, Gizmos, Res, Resource, Transform};
+use bevy::prelude::{AssetServer, Changed, Commands, Component, Entity, Gizmos, Query, Res, Resource, Transform, With, Without};
+use bevy::sprite::Sprite;
 
 /// horizontal spacing of sample points
 const STEP: f32 = 20.0;
@@ -12,67 +18,55 @@ const BASE_Y: f32 = -250.0;
 /// how far the solid body extends below the surface
 const DEPTH: f32 = 200.0;
 const SEED: f32 = 1.7;
-const PAD_WIDTH_STEPS: f32 = 6.0;              // pad is 6 * STEP = 120 px wide
-const PAD_BLEND: f32 = 5.0 * STEP;             // ramp length either side of the pad
+const PAD_WIDTH_STEPS: f32 = 6.0; // pad is 6 * STEP = 120 px wide
+const PAD_BLEND: f32 = 5.0 * STEP; // ramp length either side of the pad
 
 #[derive(Resource)]
 pub struct Terrain {
     pub points: Vec<Vec2>,
 }
 
-pub struct Pad { pub x: f32, pub y: f32, pub width: f32 }
+pub struct Pad {
+    pub x: f32,
+    pub y: f32,
+    pub width: f32,
+}
 
 fn raw_height(x: f32, seed: f32) -> f32 {
     (x * 0.004 + seed).sin() * 60.0
         + (x * 0.011 + seed * 2.3).sin() * 25.0
         + (x * 0.027 + seed * 4.1).sin() * 8.0
 }
-fn height_at(x: f32, seed: f32, pads: &[Pad]) -> f32 {
-    let raw = BASE_Y + raw_height(x, seed);
-    for pad in pads {
-        let d = (x - pad.x).abs();
-        let half = pad.width / 2.0;
-        if d <= half {
-            return pad.y;                                  // exactly flat under the pad
-        } else if d < half + PAD_BLEND {
-            let t = ((d - half) / PAD_BLEND).clamp(0.0, 1.0);
-            let t = t * t * (3.0 - 2.0 * t);               // smoothstep
-            return pad.y + (raw - pad.y) * t;              // ease back into the curve
-        }
-    }
-    raw
+
+pub fn spawn_background(
+    mut commands: Commands,
+    mut asset_server: Res<AssetServer>,
+    world: Res<World>,
+    camera: Query<Entity, With<MainCamera>>,
+) {
+    let Ok(camera) = camera.single() else {
+        return;
+    };
+
+    let city: Handle<Image> = asset_server.load(sprites::SPRITE_CITY);
+
+    commands.spawn((
+        Sprite {
+            image: city,
+            // custom_size: Some(Vec2::new(world.width(), world.height())),
+            ..Default::default()
+        },
+        Parallax {
+           factor: Vec2::new(0.3, 0.1),
+        },
+        Transform::from_xyz(world.left(), world.top(), -10.0), // behind the world, in front of the far plane
+    ));
 }
 
-
-fn hash01(n: f32) -> f32 { (n.sin() * 43758.547).fract().abs() }
-
-// fn plan_pads(world_w: f32, count: usize, seed: f32) -> Vec<Pad> {
-//     let zone = world_w / count as f32;
-//     (0..count).map(|i| {
-//         let zone_start = -world_w / 2.0 + i as f32 * zone;
-//         // keep the pad in the middle 60 percent of its zone, so neighbors never overlap
-//         let raw_x = zone_start + zone * (0.2 + 0.6 * hash01(seed + i as f32 * 12.9898));
-//         let x = (raw_x / STEP).round() * STEP;                       // snap to the grid
-//         let y = BASE_Y + raw_height(x, seed);                        // height of the unmodified curve
-//         Pad { x, y, width: PAD_WIDTH_STEPS * STEP }
-//     }).collect()
-// }
-
-/// generate a terrain floor
-pub fn spawn_terrain(mut commands: Commands, world: Res<spawn::World>) {
-    let half_w = world.world_w / 2.0;
-
-    // sample the surface across the whole window
-    let count = (world.world_w / STEP).ceil() as usize + 1;
-    let points: Vec<Vec2> = (0..count)
-        .map(|i| {
-            let x = -half_w + i as f32 * STEP;
-            Vec2::new(x, BASE_Y + raw_height(x, SEED))
-        })
-        .collect();
-
+pub fn spawn_terrain_entities(mut commands: Commands, terrain: Res<Terrain>) {
     // one convex trapezoid per segment, combined into a single compound collider
-    let shapes: Vec<(Vec2, f32, Collider)> = points
+    let shapes: Vec<(Vec2, f32, Collider)> = terrain
+        .points
         .windows(2)
         .filter_map(|w| {
             let (a, b) = (w[0], w[1]);
@@ -96,6 +90,20 @@ pub fn spawn_terrain(mut commands: Commands, world: Res<spawn::World>) {
             ],
         ),
     ));
+}
+
+/// generate a terrain floor
+pub fn build_terrain(mut commands: Commands, world: Res<spawn::World>) {
+    let half_w = world.width() / 2.0;
+
+    // sample the surface across the whole window
+    let count = (world.width() / STEP).ceil() as usize + 1;
+    let points: Vec<Vec2> = (0..count)
+        .map(|i| {
+            let x = -half_w + i as f32 * STEP;
+            Vec2::new(x, BASE_Y + raw_height(x, SEED))
+        })
+        .collect();
 
     commands.insert_resource(Terrain { points });
 }
@@ -104,5 +112,6 @@ pub fn draw_terrain(mut gizmos: Gizmos, terrain: Option<Res<Terrain>>) {
     let Some(terrain) = terrain else {
         return;
     };
+    //TODO: change from a gizmo to an asset
     gizmos.linestrip_2d(terrain.points.iter().copied(), Color::srgb(0.2, 0.7, 0.9));
 }

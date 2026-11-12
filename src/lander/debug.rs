@@ -2,23 +2,30 @@ use std::fmt::Pointer;
 use avian2d::prelude::{AngularVelocity, Forces, LinearVelocity, ReadRigidBodyForces};
 use bevy::color::Color;
 use bevy::input::ButtonInput;
-use bevy::prelude::{KeyCode, Query, Quat, Res, Transform, Vec3, With, Gizmos, Isometry2d, Vec2};
+use bevy::prelude::{KeyCode, Query, Quat, Res, Transform, Vec3, With, Gizmos, Isometry2d, Vec2, MessageWriter};
 use bevy::text::TextElement::Text;
+use crate::controls::controls::ControlsResource;
 use crate::lander::lander::Lander;
+use crate::lander::respawn::{RespawnReadyMessage, RespawnBeginMessage};
 
 pub fn debug_reset_sprite(
     input: Res<ButtonInput<KeyCode>>,
+    mut writer: MessageWriter<RespawnBeginMessage>,
+    controls: Res<ControlsResource>,
     mut query: Query<(&mut Transform, &mut LinearVelocity, &mut AngularVelocity), With<Lander>>,
 ) {
-    if !input.just_pressed(KeyCode::Escape) {
+    if !input.just_pressed(controls.reset) {
         return;
     }
-    for (mut transform, mut linear, mut angular) in &mut query {
-        transform.translation = Vec3::ZERO;
-        transform.rotation = Quat::IDENTITY;
-        linear.0 = Default::default();
-        angular.0 = 0.0;
-    }
+    // for (mut transform, mut linear, mut angular) in &mut query {
+    //     transform.translation = Vec3::ZERO;
+    //     transform.rotation = Quat::IDENTITY;
+    //     linear.0 = Default::default();
+    //     angular.0 = 0.0;
+    // }
+
+    //request respawn triggers
+    writer.write(RespawnBeginMessage);
 }
 
 pub fn debug_show_thrust(

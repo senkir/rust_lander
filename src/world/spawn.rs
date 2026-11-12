@@ -1,11 +1,11 @@
 //TODO: eventually spawn world assets in here
 
 use crate::world::layers::WorldLayer;
+use crate::world::spawn;
 use avian2d::parry::glamx::Vec2;
 use avian2d::prelude::{Collider, CollisionLayers, RigidBody};
 use bevy::color::Color;
-use bevy::prelude::{default, Commands, Res, Resource, Sprite, Transform, Bundle};
-use crate::world::spawn;
+use bevy::prelude::{Bundle, Commands, Res, Resource, Sprite, Transform, default};
 
 pub const WORLD_HEIGHT: f32 = 2000.0;
 pub const WORLD_WIDTH: f32 = 3000.0;
@@ -16,10 +16,10 @@ pub const WORLD_DENSITY: f32 = 0.5;
 
 #[derive(Resource)]
 pub struct World {
-    pub world_h: f32,
-    pub world_w: f32,
-    pub world_gravity: f32,
-    pub world_density: f32,
+    world_h: f32,
+    world_w: f32,
+    world_gravity: f32,
+    world_density: f32,
 }
 
 impl Default for World {
@@ -33,16 +33,38 @@ impl Default for World {
     }
 }
 
-pub fn spawn_world(mut commands: Commands) {
+impl World {
+
+    pub fn width(&self) -> f32 {
+        self.world_w
+    }
+
+    pub fn height(&self) -> f32 {
+        self.world_h
+    }
+    pub fn left(self: &Self) -> f32 {
+        -(self.world_w / 2.0)
+    }
+
+    pub fn right(self: &Self) -> f32 {
+        (self.world_w / 2.0)
+    }
+
+    pub fn top(self: &Self) -> f32 {
+        (self.world_h / 2.0)
+    }
+
+    pub fn bottom(self: &Self) -> f32 {
+        -(self.world_h / 2.0)
+    }
+}
+
+pub fn build_world(mut commands: Commands) {
     commands.insert_resource(World::default());
 }
 
 /// generate the environment from the world spec
-pub fn generate_bounds(
-    mut commands: Commands,
-    world: Res<spawn::World>,
-) {
-
+pub fn spawn_world_bounds(mut commands: Commands, world: Res<spawn::World>) {
     //TODO: figure out how to translate window dimensions to world dimensions
 
     let window_width = world.world_w;
@@ -56,34 +78,23 @@ pub fn generate_bounds(
     //TODO: spawn background
 
     //base floor
-    commands.spawn(
-        make_horizon(window_width, -(window_ceiling - floor_thickness))
-    );
+    commands.spawn(make_horizon(window_width, -(world.top() - floor_thickness)));
 
     // ceiling
 
-    commands.spawn(
-        make_horizon(window_width, (window_ceiling))
-    );
+    commands.spawn(make_horizon(window_width, (window_ceiling)));
 
     //base walls
 
     //left
-    commands.spawn(
-        make_wall(window_height, window_left)
-    );
+    commands.spawn(make_wall(window_height, world.left()));
 
     //right
 
-    commands.spawn(
-        make_wall(window_height, window_right)
-    );
+    commands.spawn(make_wall(window_height, world.right()));
 }
 
-fn make_wall(
-    obj_height: f32,
-    position_x: f32
-) -> impl Bundle {
+fn make_wall(obj_height: f32, position_x: f32) -> impl Bundle {
     (
         Sprite {
             color: Color::srgb(0.2, 0.7, 0.9),
@@ -105,10 +116,7 @@ fn make_wall(
     )
 }
 
-fn make_horizon(
-    width: f32,
-    position_y: f32
-) -> impl Bundle {
+fn make_horizon(width: f32, position_y: f32) -> impl Bundle {
     (
         Sprite {
             color: Color::srgb(0.2, 0.7, 0.9),
