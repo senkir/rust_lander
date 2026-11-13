@@ -13,6 +13,7 @@ pub mod controls;
 pub mod hud;
 pub mod theme;
 pub mod anim;
+use wasm_bindgen::prelude::*;
 
 use crate::beam::TractorPlugin;
 use crate::camera::CameraPlugin;
@@ -24,6 +25,7 @@ use crate::particles::ParticlePlugin;
 use crate::state::StatePlugin;
 use crate::world::WorldPlugin;
 use avian2d::PhysicsPlugins;
+use bevy::audio::AudioPlugin;
 use bevy::DefaultPlugins;
 use bevy::camera::ClearColor;
 use bevy::color::Color;
@@ -33,9 +35,11 @@ use hud::score::ScorePlugin;
 use crate::anim::AutoAnimatorPlugin;
 use crate::theme::ThemePlugin;
 
+#[wasm_bindgen(start)]
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .add_plugins(AudioPlugin::default())
         .add_plugins(TilemapPlugin)
         .add_plugins(StatePlugin)
         .add_plugins(AutoAnimatorPlugin)

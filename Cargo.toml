@@ -1,6 +1,6 @@
 [package]
-name = "Rust-Lander"
-version = "0.1.0"
+name = "cow_lander"
+version = "0.2.0"
 
 #cargo edition not project edition
 edition = "2024"
@@ -8,15 +8,53 @@ edition = "2024"
 [dependencies]
 bevy = { version = "0.20.1",
     default-features = false,
-    features = ["2d", "ui", "file_watcher", "tonemapping_luts", "zstd_rust"] }
+    #note: dynamic_linking breaks debug breakpoints
+    features = ["2d", "ui", "tonemapping_luts", "zstd_rust", "audio"] }
 
 bevy_ecs_tilemap = { version = "0.20.0", features = ["atlas"] }
 
 rand = "0.10.3"
-# localization
-fluent = "0.17.0"
 # physics
 avian2d = "0.8"
 #particle manager
 bevy_enoki = "0.8.0"
-serde = { version = "1.0.229", features = ["derive"] }
+
+#wasm bindgen
+wasm-bindgen = "0.2"
+
+# Enable a small amount of optimization in the dev profile for your code
+[profile.dev]
+opt-level = 1
+
+# Enable high optimizations for dependencies (including Bevy), but not for your code
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.wasm-release]
+inherits = "release"
+opt-level = "s"       # Or "z" for even smaller binaries
+lto = "thin"
+codegen-units = 1
+strip = "debuginfo"
+
+#useful for web release development
+# allows cargo run --target wasm32-unknown-unknown
+#[target.wasm32-unknown-unknown]
+#runner = "wasm-server-runner"
+
+[features]
+#set default features so dynamic linking is turned on for most builds.
+# cargo run --release --no-default-features
+default = ["dev"]
+dev = ["bevy/dynamic_linking", "bevy/file_watcher"]
+
+[alias]
+#alias for ease of use
+rr = "run --release --no-default-features"
+
+
+#cargo install wasm-pack
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+

@@ -5,6 +5,7 @@ use crate::world::layers::WorldLayer;
 use crate::world::terrain::Terrain;
 use avian2d::parry::glamx::Vec2;
 use avian2d::prelude::{Collider, CollisionLayers, RigidBody};
+use bevy::math::Vec3;
 use bevy::prelude::{children, default, AssetServer, Bundle, Commands, Component, Node, Res, Sprite, Transform, Val};
 use bevy::time::TimerMode;
 use rand::RngExt;
@@ -49,7 +50,7 @@ pub fn spawn_target(
         //this is the size of the collider itself at the matching position
 
         //TODO: this is a little big
-        Collider::rectangle(PLATFORM_SIZE, PLATFORM_SIZE),
+        Collider::rectangle(PLATFORM_SIZE, 30.0),
         CollisionLayers::new(
             [WorldLayer::Target],
             [
@@ -74,13 +75,7 @@ fn landing_pad_arrow(sprite_atlas_handles: &SpriteAtlasHandles) -> impl Bundle {
         AnimationIndices::new(0, 8, AnimationMode::Repeating),
         AnimationTimer::from_seconds(0.1),
         Transform::from_xyz(
-            0.0, 80.00, 4.0, //TODO: z indez
-        ),
-
-        Node {
-            height: Val::Px(64.0),
-            width: Val::Px(64.0),
-            ..default()
-        }
+            0.0, 60.00, 4.0, //TODO: z indez
+        ).with_scale(Vec3::splat(1.5)),
     )
 }

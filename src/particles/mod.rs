@@ -18,12 +18,12 @@ pub mod particles {
     pub const PARTICLE_RIGHT_THRUSTER: &str = "particles/side_thrust_right.ron";
     pub const PARTICLE_LEFT_THRUSTER: &str = "particles/side_thrust_left.ron";
     pub const PARTICLE_REVERSE_THRUSTER: &str = "particles/reverse_thrust.ron";
-    
+
     pub const PARTICLE_EXPLOSION_FIRE: &str = "particles/explosion_fire.ron";
     pub const PARTICLE_EXPLOSION_SMOKE: &str = "particles/smoke_large.ron";
-    pub const PARTICLE_EXPLOSION_SMOKE_SMALL: &str = "particles/smoke_large.ron";
+    pub const PARTICLE_EXPLOSION_SMOKE_SMALL: &str = "particles/smoke_small.ron";
     pub const PARTICLE_EXPLOSION_SPARKS: &str = "particles/explosion_sparks.ron";
-    
+
 }
 
 mod config {

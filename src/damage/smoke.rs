@@ -35,9 +35,10 @@ pub fn observe_terrain_collisions(
                 return;
             };
             info!("terrain collision");
+            //TODO: this doesnt always work great
             let impulse = collision.total_normal_impulse_magnitude();
 
-            let is_small = impulse < 50_000.0;
+            let is_small = impulse < 10_000.0;
             info!("impulse: {:?} small? {}", impulse, is_small);
 
             let Ok(pos) = transforms.get(moving_entity) else {

@@ -1,9 +1,9 @@
 (
-    spawn_rate: 0.5,
+    spawn_rate: 1.5,
     spawn_amount: 20,
     emission_shape: Circle(10.0),
-    lifetime: (5.2, 0.4),                 // outlives the fire (1.8)
-    linear_speed: Some((50.0, 0.6)),      // slow billow
+    lifetime: (1.2, 0.4),
+    linear_speed: Some((10.0, 0.6)),
     linear_acceleration: Some((0.0, 0.0)),
     direction: Some(((0.0, 1.0), 360.0)),
     angular_speed: Some((0.6, 1.0)),      // slow tumble
@@ -16,7 +16,7 @@
     angular_damp: Some((0.0, 0.0)),
     scale_curve: Some((points: [
         (0.4, 0.0, None),
-        (50.0, 0.5, Some(CubicOut)),       // keeps expanding as it dissipates
+        (30.0, 0.5, Some(CubicOut)),       // keeps expanding as it dissipates
         (1.3, 1.0, None),
     ])),
     color_curve: Some((points: [
